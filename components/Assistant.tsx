@@ -82,7 +82,7 @@ export default function Assistant({
       </div>
 
       {mods.length > 0 && (
-        <div className="border-b border-secondary bg-secondary px-4 py-2">
+        <div className="scenario-banner overflow-hidden border-b border-secondary bg-secondary px-4 py-2">
           <p className="text-xs text-secondary">
             <span className="font-semibold text-primary">{scenario.label}</span>
             {" — "}

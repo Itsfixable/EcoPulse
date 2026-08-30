@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { cx } from "@/utils/cx";
+import { useCountUp } from "./useCountUp";
 
 export function Card({
   children,
@@ -46,21 +49,29 @@ export function CardHead({
 export function Metric({
   label,
   value,
+  decimals = 0,
   unit,
   sub,
   tone = "neutral",
 }: {
   label: string;
-  value: string;
+  value: number;
+  decimals?: number;
   unit?: string;
   sub: string;
   tone?: "good" | "warn" | "neutral";
 }) {
+  const countRef = useCountUp(value, decimals);
   return (
-    <div className="rounded-xl bg-primary p-4 ring-1 ring-secondary shadow-xs">
+    <div className="metric-card rounded-xl bg-primary p-4 ring-1 ring-secondary shadow-xs">
       <p className="text-xs font-medium text-tertiary">{label}</p>
       <p className="mt-1.5 flex items-baseline gap-1">
-        <span className="tnum text-3xl font-semibold tracking-tight text-primary">{value}</span>
+        <span
+          ref={countRef}
+          className="tnum text-3xl font-semibold tracking-tight text-primary"
+        >
+          {value.toFixed(decimals)}
+        </span>
         {unit && <span className="text-sm text-tertiary">{unit}</span>}
       </p>
       <p

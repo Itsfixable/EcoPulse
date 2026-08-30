@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import type { DispatchPlan, IslandConfig } from "@/lib/types";
 
 const W = 900;
@@ -26,6 +29,39 @@ export default function Timeline({
   hour: number;
   onHour: (h: number) => void;
 }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  useGSAP(
+    () => {
+      const cols = gsap.utils.toArray<SVGGElement>(".hour-col");
+      if (cols.length) {
+        gsap.from(cols, {
+          scaleY: 0,
+          transformOrigin: "50% 100%",
+          duration: 0.5,
+          ease: "power2.out",
+          stagger: 0.014,
+        });
+      }
+      const line = svgRef.current?.querySelector<SVGPathElement>(".tank-line");
+      if (line) {
+        const len = line.getTotalLength();
+        gsap.fromTo(
+          line,
+          { strokeDasharray: len, strokeDashoffset: len },
+          {
+            strokeDashoffset: 0,
+            duration: 0.9,
+            delay: 0.2,
+            ease: "power1.inOut",
+            onComplete: () => line.removeAttribute("stroke-dasharray"),
+          },
+        );
+      }
+    },
+    { scope: svgRef, dependencies: [plan.label, plan.totals.dieselL, plan.totals.tankMinM3] },
+  );
+
   const gw = W - PAD_L;
   const gh = H - PAD_B - PAD_T;
   const bw = gw / 24;
@@ -60,7 +96,7 @@ export default function Timeline({
         </span>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img"
+      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img"
         aria-label="Hourly power sources across 24 hours with freshwater tank level">
         {plan.hours.map((h, i) => {
           let y = PAD_T + gh;
@@ -69,6 +105,7 @@ export default function Timeline({
           return (
             <g key={i} onClick={() => onHour(i)} style={{ cursor: "pointer" }}>
               <rect x={PAD_L + i * bw} y={PAD_T} width={bw} height={gh} fill="transparent" />
+              <g className="hour-col" style={{ transformBox: "fill-box", transformOrigin: "bottom" }}>
               {BANDS.map((b) => {
                 const raw = h[b.key] as number;
                 const v = b.key === "batteryKw" ? Math.max(0, raw) : raw;
@@ -80,11 +117,12 @@ export default function Timeline({
                     fill={b.color} opacity={i === hour ? 1 : 0.62} />
                 );
               })}
+              </g>
             </g>
           );
         })}
 
-        <path d={tankPath} fill="none" stroke="var(--color-water)" strokeWidth={1.8} strokeLinejoin="round" />
+        <path className="tank-line" d={tankPath} fill="none" stroke="var(--color-water)" strokeWidth={1.8} strokeLinejoin="round" />
 
         <line
           x1={PAD_L + hour * bw + bw / 2}

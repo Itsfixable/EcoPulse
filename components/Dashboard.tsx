@@ -1,7 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { compare } from "@/lib/dispatch";
 import { applyScenario, BASE_SCENARIO, type Scenario } from "@/lib/scenario";
 import Timeline from "./Timeline";
@@ -49,8 +51,32 @@ export default function Dashboard({
     return () => clearInterval(t);
   }, [playing]);
 
+  // When the assistant applies a what-if, choreograph the whole page reacting.
+  const shell = useRef<HTMLDivElement>(null);
+  useGSAP(
+    () => {
+      const cards = gsap.utils.toArray<HTMLElement>(".metric-card");
+      if (cards.length) {
+        gsap.fromTo(
+          cards,
+          { y: 8, opacity: 0.35 },
+          { y: 0, opacity: 1, duration: 0.45, ease: "power2.out", stagger: 0.05 },
+        );
+      }
+      const banner = shell.current?.querySelector(".scenario-banner");
+      if (banner) {
+        gsap.fromTo(
+          banner,
+          { height: 0, opacity: 0 },
+          { height: "auto", opacity: 1, duration: 0.35, ease: "power2.out" },
+        );
+      }
+    },
+    { scope: shell, dependencies: [scenario.label] },
+  );
+
   return (
-    <div className="min-h-screen bg-secondary">
+    <div ref={shell} className="min-h-screen bg-secondary">
       <header className="sticky top-0 z-30 border-b border-secondary bg-primary/85 backdrop-blur">
         <div className="mx-auto flex max-w-[1480px] flex-wrap items-center gap-x-3 gap-y-2 px-6 py-3">
           <span className="flex size-7 items-center justify-center rounded-md bg-brand-solid text-sm font-bold text-white">
@@ -83,7 +109,7 @@ export default function Dashboard({
         <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <Metric
             label="Diesel burned today"
-            value={String(Math.round(plan.totals.dieselL))}
+            value={plan.totals.dieselL}
             unit="L"
             sub={
               cmp.dieselSavedPct > 0
@@ -94,28 +120,28 @@ export default function Dashboard({
           />
           <Metric
             label="CO₂ avoided"
-            value={String(Math.round(cmp.co2SavedKg))}
+            value={cmp.co2SavedKg}
             unit="kg"
             sub={`baseline burns ${Math.round(cmp.naive.totals.dieselL)} L`}
             tone={cmp.co2SavedKg > 0 ? "good" : "neutral"}
           />
           <Metric
             label="Critical outages"
-            value={String(plan.totals.criticalOutageHours)}
+            value={plan.totals.criticalOutageHours}
             unit="hrs"
             sub="clinic, pumps and comms"
             tone={plan.totals.criticalOutageHours === 0 ? "good" : "warn"}
           />
           <Metric
             label="Tank low point"
-            value={String(Math.round(plan.totals.tankMinM3))}
+            value={plan.totals.tankMinM3}
             unit="m³"
             sub={plan.totals.tankRanDry ? "ran dry" : "never ran dry"}
             tone={plan.totals.tankRanDry ? "warn" : "good"}
           />
           <Metric
             label="Renewable share"
-            value={String(Math.round(plan.totals.renewableFraction * 100))}
+            value={plan.totals.renewableFraction * 100}
             unit="%"
             sub="of energy served"
             tone="good"
