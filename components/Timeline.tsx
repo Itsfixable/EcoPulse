@@ -33,35 +33,47 @@ export default function Timeline({
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const cols = gsap.utils.toArray<SVGGElement>(".hour-col");
-        if (cols.length) {
-          gsap.from(cols, {
-            scaleY: 0,
+      // Check the preference directly rather than via gsap.matchMedia: tweens
+      // created inside a matchMedia context are not owned by useGSAP, so its
+      // cleanup never reverts them and a killed from() leaves the bars frozen
+      // at scaleY 0.
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const cols = gsap.utils.toArray<SVGGElement>(".hour-col");
+      if (cols.length) {
+        gsap.fromTo(
+          cols,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
             transformOrigin: "50% 100%",
             duration: 0.72,
             ease: "power3.out",
             stagger: 0.024,
-          });
-        }
-        const line = svgRef.current?.querySelector<SVGPathElement>(".tank-line");
-        if (line) {
-          const len = line.getTotalLength();
-          gsap.fromTo(
-            line,
-            { strokeDasharray: len, strokeDashoffset: len },
-            {
-              strokeDashoffset: 0,
-              duration: 1.15,
-              delay: 0.25,
-              ease: "power2.inOut",
-              onComplete: () => line.removeAttribute("stroke-dasharray"),
-            },
-          );
-        }
-      });
-      return () => mm.revert();
+            overwrite: "auto",
+            // Drop the inline transform once done, so nothing can be left
+            // half-scaled if this re-runs mid-flight.
+            clearProps: "transform",
+          },
+        );
+      }
+
+      const line = svgRef.current?.querySelector<SVGPathElement>(".tank-line");
+      if (line) {
+        const len = line.getTotalLength();
+        gsap.fromTo(
+          line,
+          { strokeDasharray: len, strokeDashoffset: len },
+          {
+            strokeDashoffset: 0,
+            duration: 1.15,
+            delay: 0.2,
+            ease: "power2.inOut",
+            overwrite: "auto",
+            clearProps: "strokeDasharray,strokeDashoffset",
+          },
+        );
+      }
     },
     { scope: svgRef, dependencies: [plan.label, plan.totals.dieselL, plan.totals.tankMinM3] },
   );
@@ -136,7 +148,7 @@ export default function Timeline({
           strokeDasharray="3 3"
         />
 
-        <text x={PAD_L - 7} y={PAD_T + 9} textAnchor="end" fontSize={10} fill="currentColor" className="text-quaternary">
+        <text x={PAD_L - 4} y={PAD_T + 8} textAnchor="start" fontSize={10} fill="currentColor" className="text-quaternary">
           {Math.round(maxKw)} kW
         </text>
         <text x={PAD_L - 7} y={PAD_T + gh} textAnchor="end" fontSize={10} fill="currentColor" className="text-quaternary">0</text>

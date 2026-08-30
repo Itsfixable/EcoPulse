@@ -120,18 +120,24 @@ export default function Dashboard({
   const shell = useRef<HTMLDivElement>(null);
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const cards = gsap.utils.toArray<HTMLElement>(".metric-card");
-        if (cards.length) {
-          gsap.fromTo(
-            cards,
-            { y: 8, opacity: 0.35 },
-            { y: 0, opacity: 1, duration: 0.72, ease: "power3.out", stagger: 0.08 },
-          );
-        }
-      });
-      return () => mm.revert();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const cards = gsap.utils.toArray<HTMLElement>(".metric-card");
+      if (cards.length) {
+        gsap.fromTo(
+          cards,
+          { y: 8, opacity: 0.35 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.72,
+            ease: "power3.out",
+            stagger: 0.08,
+            overwrite: "auto",
+            clearProps: "transform,opacity",
+          },
+        );
+      }
     },
     { scope: shell, dependencies: [plan.totals.dieselL, order.join(",")] },
   );
@@ -231,8 +237,33 @@ export default function Dashboard({
             <Card padded={false} className="overflow-hidden">
               <div className="relative h-[520px]">
                 <IslandScene plan={now} terrain={terrain} sites={sites} island={island} />
-                <div className="pointer-events-none absolute left-4 top-4 max-w-[55%]">
-                  <p className="text-xs text-tertiary">{now.note}</p>
+                <div className="pointer-events-none absolute left-4 top-4 max-w-[58%]">
+                  <p className="scene-status-head">
+                    {now.dieselKw > 0.5
+                      ? `Generator carrying ${Math.round(now.dieselKw)} kW`
+                      : now.batteryKw > 0.5
+                        ? `Running on stored power`
+                        : "Running on renewables"}
+                  </p>
+                  <p className="scene-status-sub">
+                    {[
+                      now.solarKw > 1 ? `solar ${Math.round(now.solarKw)} kW` : null,
+                      now.windKw > 1 ? `wind ${Math.round(now.windKw)} kW` : null,
+                      `battery ${Math.round(now.batterySoc * 100)}%`,
+                      `tank ${Math.round(now.tankM3)} m³`,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                  {now.shedLoadIds.length > 0 && (
+                    <p className="scene-status-shed">
+                      paused:{" "}
+                      {now.shedLoadIds
+                        .map((id) => island.loads.find((l) => l.id === id)?.name ?? id)
+                        .join(", ")
+                        .toLowerCase()}
+                    </p>
+                  )}
                 </div>
                 <div className="pointer-events-none absolute right-4 top-4">
                   <SceneClock hour={hour} />

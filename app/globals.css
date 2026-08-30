@@ -672,3 +672,21 @@ body {
   border-radius: 3px;
   flex-shrink: 0;
 }
+
+.scene-status-head {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.scene-status-sub {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-tertiary);
+}
+.scene-status-shed {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  color: var(--color-solar);
+}
