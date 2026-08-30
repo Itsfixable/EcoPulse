@@ -232,3 +232,65 @@ export function compare(
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 const r2 = (n: number) => Math.round(n * 100) / 100;
 const r3 = (n: number) => Math.round(n * 1000) / 1000;
+
+/* --------------------------- Scoring an ordering --------------------------- */
+
+export interface PlanScore {
+  /** Critical load left unserved, in kWh. Dominates everything else. */
+  unservedTier1Kwh: number;
+  /** Essential (tier 2) load shed, in kWh. */
+  shedTier2Kwh: number;
+  dieselL: number;
+  /** Lexicographic: tier 1, then tier 2, then fuel. Lower is better. */
+  score: number;
+}
+
+export function scorePlan(c: IslandConfig, plan: DispatchPlan): PlanScore {
+  let shedTier2Kwh = 0;
+  for (const h of plan.hours) {
+    for (const id of h.shedLoadIds) {
+      const l = c.loads.find((x) => x.id === id);
+      if (l && l.tier === 2) shedTier2Kwh += loadKw(l, h.hour);
+    }
+  }
+  const unservedTier1Kwh = plan.totals.unservedTier1Kwh;
+  const dieselL = plan.totals.dieselL;
+  return {
+    unservedTier1Kwh,
+    shedTier2Kwh,
+    dieselL,
+    score: unservedTier1Kwh * 1_000_000 + shedTier2Kwh * 1_000 + dieselL,
+  };
+}
+
+function* permutations(a: string[]): Generator<string[]> {
+  if (a.length <= 1) {
+    yield a;
+    return;
+  }
+  for (let i = 0; i < a.length; i++) {
+    const rest = [...a.slice(0, i), ...a.slice(i + 1)];
+    for (const p of permutations(rest)) yield [a[i], ...p];
+  }
+}
+
+export interface BestOrder {
+  order: string[];
+  score: PlanScore;
+}
+
+/**
+ * Exhaustive search over every ordering. Seven loads is 5040 permutations and
+ * a solve costs about 0.02 ms, so this is roughly 120 ms: cheap enough to run
+ * once per island and compare the operator's choice against the true optimum
+ * rather than against a guess.
+ */
+export function findBestOrder(c: IslandConfig, forecast: ForecastHour[]): BestOrder {
+  const ids = c.loads.map((l) => l.id);
+  let best: BestOrder | null = null;
+  for (const order of permutations(ids)) {
+    const s = scorePlan(c, solve(c, forecast, "ecopulse", order));
+    if (!best || s.score < best.score.score) best = { order, score: s };
+  }
+  return best ?? { order: ids, score: scorePlan(c, solve(c, forecast, "ecopulse", ids)) };
+}

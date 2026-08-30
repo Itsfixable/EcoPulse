@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { compare } from "@/lib/dispatch";
+import { compare, findBestOrder, scorePlan } from "@/lib/dispatch";
 import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
 import IslandPicker, { type PresetIsland } from "./IslandPicker";
@@ -106,6 +106,17 @@ export default function Dashboard({
     cmp.ecopulse.totals.dieselL - baseline.ecopulse.totals.dieselL,
   );
   const outageHours = cmp.ecopulse.totals.criticalOutageHours;
+
+  // Exhaustive search over all 5040 orderings, about 120 ms, so the badge can
+  // compare against the true optimum rather than against the default.
+  const best = useMemo(() => findBestOrder(island, forecast), [island, forecast]);
+  const currentScore = useMemo(
+    () => scorePlan(island, cmp.ecopulse),
+    [island, cmp],
+  );
+  const isOptimal = currentScore.score <= best.score.score + 0.5;
+  const dieselAboveBest = Math.round(currentScore.dieselL - best.score.dieselL);
+  const isDefault = order.join() === defaultOrder.join();
   const plan = cmp.ecopulse;
   const now = plan.hours[hourIndex];
 
@@ -304,7 +315,31 @@ export default function Dashboard({
 
           <div className="flex flex-col gap-4 lg:col-span-4">
             <Card>
-              <CardHead title="Who gets power first" hint="Drag a row, or focus one and use the arrow keys. The whole day re-solves as you move it." />
+              <CardHead
+                title="Who gets power first"
+                hint="Drag a row, or focus one and use the arrow keys. The whole day re-solves as you move it."
+                action={
+                  <div className="priority-actions">
+                    <span
+                      className={`efficiency-badge${isOptimal ? " is-optimal" : outageHours > 0 ? " is-severe" : " is-costly"}`}
+                    >
+                      {isOptimal
+                        ? "Optimal"
+                        : outageHours > 0
+                          ? `${outageHours}h blackout`
+                          : `+${dieselAboveBest} L`}
+                    </span>
+                    <button
+                      type="button"
+                      className="priority-reset"
+                      onClick={() => setOrder(defaultOrder)}
+                      disabled={isDefault}
+                    >
+                      Reset
+                    </button>
+                  </div>
+                }
+              />
               <ul className="priority-legend" aria-label="What the icon colours mean">
                 <li>
                   <span style={{ background: "var(--color-diesel)" }} />
