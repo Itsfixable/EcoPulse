@@ -152,16 +152,19 @@ export default function Dashboard({
             {placeName}
             {placeCountry ? `, ${placeCountry}` : ""}
           </span>
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-secondary ring-1 ring-secondary">
-            <span
-              className="size-1.5 rounded-full"
-              style={{
-                background:
-                  staleWeather || !live ? "var(--color-solar)" : "var(--color-brand-500)",
-              }}
-            />
-            {staleWeather ? "Weather service busy" : live ? "Live forecast" : "Cached forecast"}
-          </span>
+          {/* Nothing is shown while the forecast is live; the chip appears only
+              when the data is not what the reader would assume. */}
+          {(staleWeather || !live) && (
+            <span className="ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-secondary ring-1 ring-secondary">
+              <span
+                className="size-1.5 rounded-full"
+                style={{ background: "var(--color-solar)" }}
+              />
+              {staleWeather
+                ? "Weather service busy, forecast is from the previous island"
+                : "Using a cached forecast"}
+            </span>
+          )}
         </div>
 
         <div className="mb-6 max-w-3xl">
