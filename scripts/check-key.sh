@@ -87,7 +87,11 @@ check() {
   case "$http" in
     200) echo "  ✓ works" ;;
     400) echo "  ✗ HTTP 400 — key rejected as invalid" ;;
-    401|403) echo "  ✗ HTTP $http — key not authorised" ;;
+    401|403)
+      echo "  ✗ HTTP $http — key not authorised"
+      echo "     If you just edited this secret, open a NEW shell before retrying:"
+      echo "     a running shell keeps the value it was started with."
+      ;;
     429) echo "  ! HTTP 429 — valid but rate limited" ;;
     *) echo "  ? HTTP $http" ;;
   esac
