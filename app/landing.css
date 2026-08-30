@@ -17,6 +17,8 @@
   color: var(--cream);
   min-height: 100vh;
   scroll-behavior: smooth;
+  --motion-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-snappy: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .lp * { box-sizing: border-box; }
@@ -75,6 +77,11 @@
 }
 
 .lp .hero-content { max-width: 680px; }
+.lp .hero-content > * { animation: landing-reveal 850ms var(--motion-smooth) both; }
+.lp .hero-content > :nth-child(1) { animation-delay: 90ms; }
+.lp .hero-content > :nth-child(2) { animation-delay: 170ms; }
+.lp .hero-content > :nth-child(3) { animation-delay: 250ms; }
+.lp .hero-content > :nth-child(4) { animation-delay: 330ms; }
 
 .lp .subtitle,
 .lp .section-label {
@@ -103,12 +110,12 @@
   border-radius: 30px;
   text-decoration: none;
   font-weight: 700;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform 280ms var(--motion-smooth), background-color 280ms var(--motion-smooth), box-shadow 280ms var(--motion-smooth), border-color 280ms var(--motion-smooth);
 }
 .lp .primary-btn { background: var(--coral); color: var(--night); }
-.lp .primary-btn:hover { background: var(--gold); transform: translateY(-1px); }
+.lp .primary-btn:hover { background: var(--gold); box-shadow: 0 12px 26px rgba(244, 184, 96, 0.22); transform: translateY(-3px); }
 .lp .secondary-btn { color: var(--cream); border: 1.5px solid rgba(255, 255, 255, 0.4); }
-.lp .secondary-btn:hover { border-color: var(--cream); transform: translateY(-1px); }
+.lp .secondary-btn:hover { border-color: var(--cream); background: rgba(255, 255, 255, 0.07); transform: translateY(-3px); }
 
 .lp section { padding: 60px 8%; max-width: 1100px; margin: 0 auto; }
 
@@ -141,7 +148,21 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 24px;
+  transition: transform 400ms var(--motion-smooth), background-color 400ms var(--motion-smooth), border-color 400ms var(--motion-smooth), box-shadow 400ms var(--motion-smooth);
+  animation: card-reveal 650ms var(--motion-smooth) both;
 }
+.lp .stat-card:hover,
+.lp .data-card:hover,
+.lp .issue-card:hover,
+.lp .solution-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.085);
+  border-color: rgba(246, 241, 231, 0.24);
+  box-shadow: 0 18px 35px rgba(6, 8, 30, 0.22);
+}
+.lp .stats > :nth-child(2), .lp .dashboard-grid > :nth-child(2), .lp .issue-grid > :nth-child(2), .lp .solution-grid > :nth-child(2) { animation-delay: 70ms; }
+.lp .stats > :nth-child(3), .lp .dashboard-grid > :nth-child(3), .lp .issue-grid > :nth-child(3), .lp .solution-grid > :nth-child(3) { animation-delay: 140ms; }
+.lp .stats > :nth-child(4), .lp .dashboard-grid > :nth-child(4) { animation-delay: 210ms; }
 
 .lp .stat-card span,
 .lp .issue-card span,
@@ -207,8 +228,10 @@
   cursor: pointer;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.35);
   z-index: 2000;
+  transition: transform 300ms var(--motion-smooth), background-color 300ms var(--motion-smooth), box-shadow 300ms var(--motion-smooth);
 }
-#chatbot-button:hover { background: #46a457; }
+#chatbot-button:hover { background: #46a457; box-shadow: 0 11px 28px rgba(59, 140, 74, 0.4); transform: translateY(-4px) scale(1.04); }
+#chatbot-button:active { transform: translateY(-1px) scale(0.96); }
 
 #chatbot {
   position: fixed;
@@ -227,6 +250,7 @@
   overflow: hidden;
   z-index: 2000;
   font-family: "Inter", Arial, sans-serif;
+  animation: chat-enter 380ms var(--motion-smooth) both;
 }
 
 #chatbot .chat-header {
@@ -292,7 +316,22 @@
   border-radius: 50%;
   cursor: pointer;
   flex-shrink: 0;
+  transition: transform 220ms var(--motion-smooth), background-color 220ms var(--motion-smooth);
 }
+#send-button:not(:disabled):hover { background: #46a457; transform: scale(1.08); }
 #send-button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .lp .wordmark { display: flex; align-items: center; gap: 10px; }
+
+@keyframes landing-reveal {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes card-reveal {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes chat-enter {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -58,6 +58,13 @@ body {
   font-feature-settings: "tnum" 1, "cv01" 1;
 }
 
+/* Shared motion language: deliberate, spring-like deceleration rather than
+   abrupt browser defaults. */
+:root {
+  --motion-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Fraunces is the landing page's display face; using it for dashboard
    headings ties the two halves together without touching data type. */
 .display {
@@ -94,6 +101,7 @@ body {
   backdrop-filter: blur(10px) saturate(140%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 360ms var(--motion-smooth), border-color 360ms var(--motion-smooth), box-shadow 360ms var(--motion-smooth);
 }
 
 .site-nav-brand {
@@ -105,7 +113,9 @@ body {
   font-family: "Fraunces", ui-serif, Georgia, serif;
   font-size: 24px;
   font-weight: 600;
+  transition: color 240ms var(--motion-smooth), transform 240ms var(--motion-smooth);
 }
+.site-nav-brand:hover { transform: translateY(-1px); }
 
 .site-nav-links {
   display: flex;
@@ -120,9 +130,9 @@ body {
   font-weight: 600;
   font-size: 15px;
   opacity: 0.85;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition: opacity 260ms var(--motion-smooth), color 260ms var(--motion-smooth), transform 260ms var(--motion-smooth);
 }
-.site-nav-links a:hover { opacity: 1; color: var(--nav-green); }
+.site-nav-links a:hover { opacity: 1; color: var(--nav-green); transform: translateY(-1px); }
 .site-nav-links a[aria-current="page"] { opacity: 1; color: var(--nav-gold); }
 
 .site-nav-cta {
@@ -131,11 +141,21 @@ body {
   padding: 8px 16px;
   border-radius: 20px;
   opacity: 1 !important;
+  transition: background-color 280ms var(--motion-smooth), color 280ms var(--motion-smooth), box-shadow 280ms var(--motion-smooth), transform 280ms var(--motion-smooth);
 }
-.site-nav-cta:hover { background: var(--nav-gold); color: var(--nav-night) !important; }
+.site-nav-cta:hover { background: var(--nav-gold); color: var(--nav-night) !important; box-shadow: 0 8px 22px rgba(244, 184, 96, 0.22); transform: translateY(-2px); }
 .site-nav-cta[aria-current="page"] { background: var(--nav-gold); color: var(--nav-night) !important; }
 
 @media (max-width: 560px) {
   .site-nav { padding: 12px 5%; }
   .site-nav-links { gap: 10px 16px; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
 }

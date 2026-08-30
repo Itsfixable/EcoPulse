@@ -116,7 +116,7 @@ export default function Dashboard({
         gsap.fromTo(
           cards,
           { y: 8, opacity: 0.35 },
-          { y: 0, opacity: 1, duration: 0.45, ease: "power2.out", stagger: 0.05 },
+          { y: 0, opacity: 1, duration: 0.72, ease: "power3.out", stagger: 0.08 },
         );
       }
       const banner = shell.current?.querySelector(".scenario-banner");
@@ -124,7 +124,7 @@ export default function Dashboard({
         gsap.fromTo(
           banner,
           { height: 0, opacity: 0 },
-          { height: "auto", opacity: 1, duration: 0.35, ease: "power2.out" },
+          { height: "auto", opacity: 1, duration: 0.56, ease: "power3.out" },
         );
       }
     },

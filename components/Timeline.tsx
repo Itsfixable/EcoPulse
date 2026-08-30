@@ -38,9 +38,9 @@ export default function Timeline({
         gsap.from(cols, {
           scaleY: 0,
           transformOrigin: "50% 100%",
-          duration: 0.5,
-          ease: "power2.out",
-          stagger: 0.014,
+          duration: 0.72,
+          ease: "power3.out",
+          stagger: 0.024,
         });
       }
       const line = svgRef.current?.querySelector<SVGPathElement>(".tank-line");
@@ -51,9 +51,9 @@ export default function Timeline({
           { strokeDasharray: len, strokeDashoffset: len },
           {
             strokeDashoffset: 0,
-            duration: 0.9,
-            delay: 0.2,
-            ease: "power1.inOut",
+            duration: 1.15,
+            delay: 0.25,
+            ease: "power2.inOut",
             onComplete: () => line.removeAttribute("stroke-dasharray"),
           },
         );
