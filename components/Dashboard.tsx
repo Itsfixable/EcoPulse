@@ -5,10 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { compare } from "@/lib/dispatch";
-import { applyScenario, BASE_SCENARIO, type Scenario } from "@/lib/scenario";
 import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
-import Assistant from "./Assistant";
 import IslandPicker, { type PresetIsland } from "./IslandPicker";
 import { Card, CardHead, Metric } from "./ui";
 import { buildTerrain, placeSites } from "./terrain";
@@ -91,13 +89,11 @@ export default function Dashboard({
 
   const [hour, setHour] = useState(13);
   const [playing, setPlaying] = useState(false);
-  const [scenario, setScenario] = useState<Scenario>(BASE_SCENARIO);
   const [order, setOrder] = useState<string[]>(() =>
     [...island.loads].sort((a, b) => a.tier - b.tier).map((l) => l.id),
   );
 
-  const config = useMemo(() => applyScenario(island, scenario), [island, scenario]);
-  const cmp = useMemo(() => compare(config, forecast, order), [config, forecast, order]);
+  const cmp = useMemo(() => compare(island, forecast, order), [island, forecast, order]);
   const plan = cmp.ecopulse;
   const now = plan.hours[hour];
 
@@ -107,7 +103,8 @@ export default function Dashboard({
     return () => clearInterval(t);
   }, [playing]);
 
-  // When the assistant applies a what-if, choreograph the whole page reacting.
+  // Re-count the metrics whenever the plan changes, so a reorder reads as a
+  // recalculation rather than numbers silently swapping.
   const shell = useRef<HTMLDivElement>(null);
   useGSAP(
     () => {
@@ -119,16 +116,8 @@ export default function Dashboard({
           { y: 0, opacity: 1, duration: 0.72, ease: "power3.out", stagger: 0.08 },
         );
       }
-      const banner = shell.current?.querySelector(".scenario-banner");
-      if (banner) {
-        gsap.fromTo(
-          banner,
-          { height: 0, opacity: 0 },
-          { height: "auto", opacity: 1, duration: 0.56, ease: "power3.out" },
-        );
-      }
     },
-    { scope: shell, dependencies: [scenario.label] },
+    { scope: shell, dependencies: [plan.totals.dieselL, order.join(",")] },
   );
 
   return (
@@ -219,7 +208,7 @@ export default function Dashboard({
         <div className="grid gap-4 lg:grid-cols-12">
           <div className="flex flex-col gap-4 lg:col-span-8">
             <Card padded={false} className="overflow-hidden">
-              <div className="relative h-[430px]">
+              <div className="relative h-[520px]">
                 <IslandScene plan={now} terrain={terrain} sites={sites} />
                 <div className="pointer-events-none absolute left-4 top-4">
                   <p className="text-xs font-medium text-secondary">Island at {clock(hour)}</p>
@@ -253,19 +242,15 @@ export default function Dashboard({
                 title="Dispatch plan"
                 hint="Where every kilowatt comes from, and what it costs the water tank"
               />
-              <Timeline plan={plan} island={config} hour={hour} onHour={setHour} />
+              <Timeline plan={plan} island={island} hour={hour} onHour={setHour} />
             </Card>
           </div>
 
           <div className="flex flex-col gap-4 lg:col-span-4">
-            <Card padded={false} className="flex h-[430px] flex-col overflow-hidden">
-              <Assistant forecast={forecast} scenario={scenario} onScenario={setScenario} />
-            </Card>
-
             <Card>
               <CardHead title="Who gets power first" hint="Drag to reorder — the day re-solves instantly" />
               <PriorityList
-                island={config}
+                island={island}
                 order={order}
                 onOrder={setOrder}
                 servedIds={now.servedLoadIds}
