@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { compare, findBestOrder, scorePlan } from "@/lib/dispatch";
+import { compare } from "@/lib/dispatch";
 import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
 import IslandPicker, { type PresetIsland } from "./IslandPicker";
@@ -44,6 +44,9 @@ export default function Dashboard({
   const [islandBusy, setIslandBusy] = useState(false);
   const [islandError, setIslandError] = useState<string | null>(null);
   const [staleWeather, setStaleWeather] = useState(false);
+  // The page opens showing the island's current practice: a fixed daily
+  // schedule. Optimising is a thing the reader does, not a thing already done.
+  const [optimized, setOptimized] = useState(false);
 
   const terrain = useMemo(() => buildTerrain(grid), [grid]);
   const sites = useMemo(() => placeSites(terrain), [terrain]);
@@ -107,17 +110,8 @@ export default function Dashboard({
   );
   const outageHours = cmp.ecopulse.totals.criticalOutageHours;
 
-  // Exhaustive search over all 5040 orderings, about 120 ms, so the badge can
-  // compare against the true optimum rather than against the default.
-  const best = useMemo(() => findBestOrder(island, forecast), [island, forecast]);
-  const currentScore = useMemo(
-    () => scorePlan(island, cmp.ecopulse),
-    [island, cmp],
-  );
-  const isOptimal = currentScore.score <= best.score.score + 0.5;
-  const dieselAboveBest = Math.round(currentScore.dieselL - best.score.dieselL);
   const isDefault = order.join() === defaultOrder.join();
-  const plan = cmp.ecopulse;
+  const plan = optimized ? cmp.ecopulse : cmp.naive;
   const now = plan.hours[hourIndex];
 
   useEffect(() => {
@@ -199,6 +193,27 @@ export default function Dashboard({
           />
         </div>
 
+        <div className={`optimize-bar${optimized ? " is-on" : ""}`}>
+          <div className="optimize-copy">
+            <p className="optimize-state">
+              {optimized ? "Running the EcoPulse plan" : "Running today's fixed schedule"}
+            </p>
+            <p className="optimize-detail">
+              {optimized
+                ? `${Math.round(cmp.ecopulse.totals.dieselL)} L of diesel, ${Math.round(cmp.dieselSavedPct)}% less than the island burns today.`
+                : `${Math.round(cmp.naive.totals.dieselL)} L of diesel. Desalination runs 8am to 6pm whatever the weather is doing.`}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="optimize-button"
+            onClick={() => setOptimized((o) => !o)}
+            aria-pressed={optimized}
+          >
+            {optimized ? "Show the fixed schedule" : "Optimise the day"}
+          </button>
+        </div>
+
         <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <Metric
             label="Diesel burned today"
@@ -206,19 +221,23 @@ export default function Dashboard({
             value={plan.totals.dieselL}
             unit="L"
             sub={
-              cmp.dieselSavedPct > 0
-                ? `${Math.round(cmp.dieselSavedPct)}% less than a fixed schedule`
-                : "same as a fixed schedule"
+              optimized
+                ? `${Math.round(cmp.dieselSavedPct)}% less than the fixed schedule`
+                : `today's fixed schedule`
             }
-            tone={cmp.dieselSavedPct > 0 ? "good" : "neutral"}
+            tone={optimized ? "good" : "warn"}
           />
           <Metric
             label="CO₂ avoided"
             accent="var(--color-wind)"
-            value={cmp.co2SavedKg}
+            value={optimized ? cmp.co2SavedKg : 0}
             unit="kg"
-            sub={`baseline burns ${Math.round(cmp.naive.totals.dieselL)} L`}
-            tone={cmp.co2SavedKg > 0 ? "good" : "neutral"}
+            sub={
+              optimized
+                ? `against ${Math.round(cmp.naive.totals.dieselL)} L on the fixed schedule`
+                : "nothing avoided yet"
+            }
+            tone={optimized ? "good" : "warn"}
           />
           <Metric
             label="Critical outages"
@@ -312,25 +331,14 @@ export default function Dashboard({
                 title="Who gets power first"
                 hint="Drag a row, or focus one and use the arrow keys. The whole day re-solves as you move it."
                 action={
-                  <div className="priority-actions">
-                    <span
-                      className={`efficiency-badge${isOptimal ? " is-optimal" : outageHours > 0 ? " is-severe" : " is-costly"}`}
-                    >
-                      {isOptimal
-                        ? "Optimal"
-                        : outageHours > 0
-                          ? `${outageHours}h blackout`
-                          : `+${dieselAboveBest} L`}
-                    </span>
-                    <button
-                      type="button"
-                      className="priority-reset"
-                      onClick={() => setOrder(defaultOrder)}
-                      disabled={isDefault}
-                    >
-                      Reset
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="priority-reset"
+                    onClick={() => setOrder(defaultOrder)}
+                    disabled={isDefault}
+                  >
+                    Reset order
+                  </button>
                 }
               />
               <ul className="priority-legend" aria-label="What the icon colours mean">

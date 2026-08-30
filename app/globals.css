@@ -735,3 +735,72 @@ body {
   background: color-mix(in srgb, var(--color-brand-500) 12%, transparent);
 }
 .priority-reset:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ============================================================
+   Optimise toggle: the page's primary action
+   ============================================================ */
+.optimize-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 1rem;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--color-diesel) 40%, transparent);
+  background: color-mix(in srgb, var(--color-diesel) 11%, transparent);
+  transition: border-color 420ms var(--motion-smooth, ease),
+    background-color 420ms var(--motion-smooth, ease);
+}
+.optimize-bar.is-on {
+  border-color: color-mix(in srgb, var(--color-brand-500) 45%, transparent);
+  background: color-mix(in srgb, var(--color-brand-500) 11%, transparent);
+}
+
+.optimize-copy { flex: 1 1 320px; min-width: 0; }
+
+.optimize-state {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-diesel);
+  transition: color 420ms var(--motion-smooth, ease);
+}
+.optimize-bar.is-on .optimize-state { color: var(--color-brand-400); }
+
+.optimize-detail {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+}
+
+.optimize-button {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-bg-primary);
+  background: var(--color-diesel);
+  border: 1px solid transparent;
+  transition: transform 240ms var(--motion-smooth, ease),
+    background-color 300ms var(--motion-smooth, ease),
+    box-shadow 240ms var(--motion-smooth, ease);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-diesel) 30%, transparent);
+}
+.optimize-button:hover { transform: translateY(-2px); }
+.optimize-bar.is-on .optimize-button {
+  color: var(--color-text-primary);
+  background: transparent;
+  border-color: rgba(246, 241, 231, 0.22);
+  box-shadow: none;
+}
+.optimize-bar.is-on .optimize-button:hover {
+  background: rgba(246, 241, 231, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .optimize-button:hover { transform: none; }
+}
