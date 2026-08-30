@@ -37,6 +37,18 @@ check() {
     echo "  ! the stored value has surrounding whitespace or quotes; trimmed before testing"
   fi
 
+  # Shape report. Prints structure, never the key: the first three and last two
+  # characters, and any character outside the alphabet these keys use.
+  printf '  shape: starts %s… ends …%s\n' "$(printf %s "$key" | cut -c1-3)" "$(printf %s "$key" | tail -c 3)"
+  local odd
+  odd="$(printf %s "$key" | grep -oE '[^A-Za-z0-9._-]' | sort -u | tr -d '\n')"
+  if [ -n "$odd" ]; then
+    echo "  ! contains characters these keys never use:"
+    printf %s "$key" | grep -obE '[^A-Za-z0-9._-]' | while IFS=: read -r pos ch; do
+      printf "      position %s: %s (hex %s)\n" "$((pos + 1))" "$ch" "$(printf %s "$ch" | xxd -p | head -c 8)"
+    done
+  fi
+
   case "$name" in
     GEMINI_API_KEY)
       # Google is migrating from "Standard" AIza keys to "Auth" AQ. keys;
