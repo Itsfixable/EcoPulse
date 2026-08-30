@@ -1,0 +1,26 @@
+# Replit uses these scripts rather than `dev`/`start` so local development
+# keeps its own port and host settings.
+run = "npm run dev:replit"
+entrypoint = "app/page.tsx"
+modules = ["nodejs-22"]
+
+[nix]
+channel = "stable-24_11"
+
+[env]
+NEXT_TELEMETRY_DISABLED = "1"
+
+# Replit's router cannot reach a server bound to localhost, so both scripts
+# bind 0.0.0.0 and read $PORT.
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start:replit"]
+
+[[hints]]
+regex = "ANTHROPIC_API_KEY|GEMINI_API_KEY|OPENAI_API_KEY"
+message = "Put model API keys in the Secrets pane, not in a file."
