@@ -1,6 +1,7 @@
 import Link from "next/link";
 import "./landing.css";
 import EcoBot from "@/components/EcoBot";
+import LandingMotion from "@/components/LandingMotion";
 import { TAU } from "@/lib/island";
 import { compare } from "@/lib/dispatch";
 import { normalize, fetchForecast, type RawForecast } from "@/lib/openmeteo";
@@ -193,6 +194,7 @@ export default async function Landing() {
       </footer>
 
       <EcoBot forecast={forecast} />
+      <LandingMotion />
     </div>
   );
 }
