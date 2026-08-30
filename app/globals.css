@@ -637,3 +637,38 @@ body {
 #chatbot .chat-header h3 { display: flex; align-items: center; gap: 6px; }
 #close-chat,
 #send-button { display: grid; place-items: center; }
+
+.priority-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  color: var(--accent, var(--color-brand-500));
+  border: 1px solid color-mix(in srgb, var(--accent, var(--color-brand-500)) 30%, transparent);
+  background: color-mix(in srgb, var(--accent, var(--color-brand-500)) 12%, transparent);
+}
+
+.priority-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+.priority-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+.priority-legend span {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}

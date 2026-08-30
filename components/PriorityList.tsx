@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LoadIcon, loadAccent } from "./loadIcons";
 import type { IslandConfig } from "@/lib/types";
 
 export default function PriorityList({
@@ -55,8 +56,12 @@ export default function PriorityList({
               }
             }}
             className={`priority-row${dragId === id ? " is-dragging" : ""}${on ? "" : " is-paused"}`}
+            style={{ ["--accent" as string]: loadAccent(load.tier) }}
           >
             <span className="priority-rank">{i + 1}</span>
+            <span className="priority-icon">
+              <LoadIcon id={id} />
+            </span>
             <span className="priority-name">{load.name}</span>
             <span className="priority-kw">{load.kw} kW</span>
             {!on && <span className="priority-state">paused</span>}

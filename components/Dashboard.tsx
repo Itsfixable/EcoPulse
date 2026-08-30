@@ -271,6 +271,21 @@ export default function Dashboard({
           <div className="flex flex-col gap-4 lg:col-span-4">
             <Card>
               <CardHead title="Who gets power first" hint="Drag a row, or focus one and use the arrow keys. The whole day re-solves as you move it." />
+              <ul className="priority-legend" aria-label="What the icon colours mean">
+                <li>
+                  <span style={{ background: "var(--color-diesel)" }} />
+                  Critical, never shed
+                </li>
+                <li>
+                  <span style={{ background: "var(--color-solar)" }} />
+                  Essential
+                </li>
+                <li>
+                  <span style={{ background: "var(--color-water)" }} />
+                  Deferrable
+                </li>
+              </ul>
+
               <PriorityList
                 island={island}
                 order={order}
@@ -309,24 +324,10 @@ export default function Dashboard({
                   </>
                 )}
               </p>
-              <p className="mt-3 text-xs leading-relaxed text-tertiary">
-                Any system that rations power decides who goes without. That decision belongs to
-                the island, not to us, so it sits here in the open rather than buried in a
-                constant. The solver does the arithmetic. You set what matters.
-              </p>
             </Card>
           </div>
         </div>
 
-        <footer className="mt-6 text-xs text-tertiary">
-          {staleWeather
-            ? "Terrain updated, but the weather service was busy, so the forecast shown is from the previous island. "
-            : ""}
-          Terrain is real elevation sampled from Open-Meteo at {grid.n}&times;{grid.n} points
-          across a {grid.spanKm} km box ({grid.lat.toFixed(3)}, {grid.lon.toFixed(3)}), peak{" "}
-          {Math.round(grid.max)} m. Weather is a live forecast for the same point. Load and
-          hardware figures are modelled on published island-microgrid data.
-        </footer>
       </main>
 
       <EcoBot forecast={forecast} />
