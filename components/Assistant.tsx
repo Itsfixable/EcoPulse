@@ -28,6 +28,7 @@ export default function Assistant({
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [provider, setProvider] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function Assistant({
       });
       const data = await res.json();
       setMsgs([...next, { role: "assistant", content: data.reply }]);
+      if (data.provider) setProvider(data.provider);
       if (data.scenario) onScenario(data.scenario);
     } catch {
       setMsgs([
@@ -66,7 +68,10 @@ export default function Assistant({
       <div className="flex items-center justify-between gap-2 border-b border-secondary px-4 py-3">
         <div>
           <h2 className="text-sm font-semibold text-primary">Operations assistant</h2>
-          <p className="text-xs text-tertiary">Grounded in the solver&apos;s hourly output</p>
+          <p className="text-xs text-tertiary">
+            Grounded in the solver&apos;s hourly output
+            {provider && provider !== "offline" ? ` · ${provider}` : ""}
+          </p>
         </div>
         {mods.length > 0 && (
           <button

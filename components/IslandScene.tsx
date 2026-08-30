@@ -4,53 +4,55 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { ISLAND_R, SITES, islandHeight, siteY } from "./terrain";
+import { HALF, siteY, type Site, type TerrainModel } from "./terrain";
 import type { HourPlan } from "@/lib/types";
 
-function Terrain() {
+function Terrain({ t }: { t: TerrainModel }) {
   const geo = useMemo(() => {
-    const seg = 190;
-    const size = ISLAND_R * 2.9;
-    const g = new THREE.PlaneGeometry(size, size, seg, seg);
+    const seg = 180;
+    const g = new THREE.PlaneGeometry(HALF * 2, HALF * 2, seg, seg);
     g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position as THREE.BufferAttribute;
     const colors: number[] = [];
+
+    const seabed = new THREE.Color("#12212b");
     const sand = new THREE.Color("#b9a173");
-    const low = new THREE.Color("#2e5b3d");
-    const high = new THREE.Color("#4a6b4a");
-    const rock = new THREE.Color("#6d6559");
+    const low = new THREE.Color("#2f5c3e");
+    const mid = new THREE.Color("#47694a");
+    const rock = new THREE.Color("#6f6659");
+
     for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-      const y = islandHeight(x, z);
+      const y = t.heightAt(pos.getX(i), pos.getZ(i));
       pos.setY(i, y);
       const c = new THREE.Color();
-      if (y < 0.08) c.copy(sand);
-      else if (y < 0.9) c.lerpColors(low, high, y / 0.9);
-      else c.lerpColors(high, rock, Math.min(1, (y - 0.9) / 1.2));
+      if (y <= 0) c.copy(seabed);
+      else if (y < 0.09) c.copy(sand);
+      else if (y < 1.0) c.lerpColors(low, mid, y / 1.0);
+      else c.lerpColors(mid, rock, Math.min(1, (y - 1.0) / 1.4));
       colors.push(c.r, c.g, c.b);
     }
     g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
     g.computeVertexNormals();
     return g;
-  }, []);
+  }, [t]);
 
   return (
-    <mesh geometry={geo} receiveShadow>
+    <mesh geometry={geo}>
       <meshStandardMaterial vertexColors roughness={0.95} metalness={0} flatShading />
     </mesh>
   );
 }
 
-function Ocean({ hour }: { hour: number }) {
-  const night = hour < 6 || hour > 18;
+function Ocean({ night }: { night: boolean }) {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.12, 0]}>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
       <circleGeometry args={[70, 96]} />
       <meshStandardMaterial
-        color={night ? "#040810" : "#08202f"}
-        roughness={0.82}
+        color={night ? "#040810" : "#0a2333"}
+        roughness={0.8}
         metalness={0.05}
+        transparent
+        opacity={0.94}
       />
     </mesh>
   );
@@ -69,15 +71,24 @@ function Flow({
 }) {
   const curve = useMemo(() => {
     const mid = from.clone().lerp(to, 0.5);
-    mid.y += from.distanceTo(to) * 0.28 + 0.5;
+    mid.y += from.distanceTo(to) * 0.26 + 0.45;
     return new THREE.QuadraticBezierCurve3(from, mid, to);
   }, [from, to]);
 
-  const pts = useMemo(() => curve.getPoints(40), [curve]);
   const lineGeo = useMemo(
-    () => new THREE.BufferGeometry().setFromPoints(pts),
-    [pts],
+    () => new THREE.BufferGeometry().setFromPoints(curve.getPoints(40)),
+    [curve],
   );
+  const material = useMemo(
+    () =>
+      new THREE.LineBasicMaterial({
+        color,
+        transparent: true,
+        opacity: Math.min(0.5, 0.14 + power / 1600),
+      }),
+    [color, power],
+  );
+  const line = useMemo(() => new THREE.Line(lineGeo, material), [lineGeo, material]);
 
   const count = Math.max(1, Math.min(7, Math.round(power / 90)));
   const dots = useRef<THREE.InstancedMesh>(null);
@@ -87,21 +98,18 @@ function Flow({
     if (!dots.current) return;
     const t = clock.getElapsedTime();
     for (let i = 0; i < count; i++) {
-      const p = ((t * 0.34 + i / count) % 1 + 1) % 1;
-      const v = curve.getPoint(p);
-      dummy.position.copy(v);
-      dummy.scale.setScalar(0.075);
+      const p = (t * 0.34 + i / count) % 1;
+      dummy.position.copy(curve.getPoint(p));
+      dummy.scale.setScalar(0.07);
       dummy.updateMatrix();
       dots.current.setMatrixAt(i, dummy.matrix);
     }
     dots.current.instanceMatrix.needsUpdate = true;
   });
 
-  const opacity = Math.min(0.5, 0.14 + power / 1600);
-
   return (
     <group>
-      <primitive object={new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity }))} />
+      <primitive object={line} />
       <instancedMesh ref={dots} args={[undefined, undefined, count]} key={count}>
         <sphereGeometry args={[1, 8, 8]} />
         <meshBasicMaterial color={color} />
@@ -112,29 +120,31 @@ function Flow({
 
 function Marker({
   site,
+  y,
   active,
   intensity,
 }: {
-  site: (typeof SITES)[number];
+  site: Site;
+  y: number;
   active: boolean;
   intensity: number;
 }) {
-  const y = siteY(site);
-  const h = site.kind === "source" ? 0.5 : 0.34;
+  const h = site.kind === "source" ? 0.46 : 0.3;
   const len = Math.hypot(site.x, site.z) || 1;
   const out = { x: site.x / len, z: site.z / len };
+
   return (
     <group position={[site.x, y, site.z]}>
       <mesh position={[0, h / 2, 0]}>
-        <cylinderGeometry args={[0.075, 0.075, h, 10]} />
+        <cylinderGeometry args={[0.07, 0.07, h, 10]} />
         <meshStandardMaterial
           color={active ? site.color : "#2b3442"}
           emissive={active ? site.color : "#000000"}
           emissiveIntensity={active ? 0.5 + intensity : 0}
         />
       </mesh>
-      <mesh position={[0, h + 0.11, 0]}>
-        <sphereGeometry args={[0.13, 14, 14]} />
+      <mesh position={[0, h + 0.1, 0]}>
+        <sphereGeometry args={[0.12, 14, 14]} />
         <meshStandardMaterial
           color={active ? site.color : "#39434f"}
           emissive={active ? site.color : "#000000"}
@@ -142,17 +152,11 @@ function Marker({
         />
       </mesh>
       {active && (
-        <Html
-          center
-          distanceFactor={10}
-          position={[out.x * 1.15, h + 0.55, out.z * 1.15]}
-          zIndexRange={[10, 0]}
-        >
+        <Html center distanceFactor={8} position={[out.x * 0.55, h + 0.62, out.z * 0.55]} zIndexRange={[10, 0]}>
           <div
             style={{
-              fontSize: 12,
+              fontSize: 11,
               lineHeight: 1.1,
-              letterSpacing: 0.2,
               whiteSpace: "nowrap",
               color: "#dfe7f0",
               background: "rgba(8,11,17,0.82)",
@@ -182,14 +186,26 @@ function Marker({
   );
 }
 
-function Scene({ plan }: { plan: HourPlan }) {
+function Scene({
+  plan,
+  terrain,
+  sites,
+}: {
+  plan: HourPlan;
+  terrain: TerrainModel;
+  sites: Site[];
+}) {
   const hour = plan.hour;
-  const sunAngle = ((hour - 6) / 12) * Math.PI;
   const day = hour >= 6 && hour <= 18;
-  const sunY = Math.sin(sunAngle) * 9;
-  const sunX = Math.cos(sunAngle) * 11;
+  const angle = ((hour - 6) / 12) * Math.PI;
 
-  const hub = useMemo(() => new THREE.Vector3(0, islandHeight(0.6, -0.4) + 1.5, 0), []);
+  const hub = useMemo(() => {
+    const peak = sites.reduce(
+      (best, s) => (siteY(terrain, s) > siteY(terrain, best) ? s : best),
+      sites[0],
+    );
+    return new THREE.Vector3(peak.x * 0.3, siteY(terrain, peak) + 1.3, peak.z * 0.3);
+  }, [terrain, sites]);
 
   const sourcePower: Record<string, number> = {
     solar: plan.solarKw,
@@ -202,64 +218,59 @@ function Scene({ plan }: { plan: HourPlan }) {
     <>
       <ambientLight intensity={day ? 0.55 : 0.18} />
       <directionalLight
-        position={[sunX, Math.max(sunY, 0.6), 4]}
+        position={[Math.cos(angle) * 11, Math.max(Math.sin(angle) * 9, 0.6), 4]}
         intensity={day ? 1.5 : 0.15}
         color={day ? "#fff3e0" : "#4a6ea8"}
       />
       <hemisphereLight args={["#5f7fa8", "#101418", day ? 0.5 : 0.25]} />
 
-      <Terrain />
-      <Ocean hour={hour} />
+      <Terrain t={terrain} />
+      <Ocean night={!day} />
 
-      {SITES.map((s) => {
+      {sites.map((s) => {
         const isSource = s.kind === "source";
-        const p = isSource ? sourcePower[s.id] ?? 0 : 0;
-        const active = isSource
-          ? p > 1
-          : plan.servedLoadIds.includes(s.id);
+        const p = sourcePower[s.id] ?? 0;
         return (
           <Marker
             key={s.id}
             site={s}
-            active={active}
+            y={siteY(terrain, s)}
+            active={isSource ? p > 1 : plan.servedLoadIds.includes(s.id)}
             intensity={isSource ? Math.min(1, p / 900) : 0.25}
           />
         );
       })}
 
-      {SITES.filter((s) => s.kind === "source").map((s) => {
-        const p = sourcePower[s.id] ?? 0;
-        if (p <= 1) return null;
-        return (
+      {sites
+        .filter((s) => s.kind === "source" && (sourcePower[s.id] ?? 0) > 1)
+        .map((s) => (
           <Flow
             key={s.id}
-            from={new THREE.Vector3(s.x, siteY(s) + 0.6, s.z)}
+            from={new THREE.Vector3(s.x, siteY(terrain, s) + 0.55, s.z)}
             to={hub}
-            power={p}
+            power={sourcePower[s.id]}
             color={s.color}
           />
-        );
-      })}
+        ))}
 
-      {SITES.filter((s) => s.kind === "load").map((s) => {
-        if (!plan.servedLoadIds.includes(s.id)) return null;
-        return (
+      {sites
+        .filter((s) => s.kind === "load" && plan.servedLoadIds.includes(s.id))
+        .map((s) => (
           <Flow
             key={s.id}
             from={hub}
-            to={new THREE.Vector3(s.x, siteY(s) + 0.45, s.z)}
+            to={new THREE.Vector3(s.x, siteY(terrain, s) + 0.4, s.z)}
             power={260}
-            color={s.id === "desal" ? "#4aa3d4" : "#93a3b8"}
+            color={s.id === "desal" ? "#45a5d8" : "#93a3b8"}
           />
-        );
-      })}
+        ))}
 
       <OrbitControls
         enablePan={false}
         minDistance={9}
-        maxDistance={26}
-        maxPolarAngle={Math.PI / 2.06}
+        maxDistance={28}
         minPolarAngle={Math.PI / 5}
+        maxPolarAngle={Math.PI / 2.06}
         autoRotate
         autoRotateSpeed={0.22}
       />
@@ -267,12 +278,20 @@ function Scene({ plan }: { plan: HourPlan }) {
   );
 }
 
-export default function IslandScene({ plan }: { plan: HourPlan }) {
+export default function IslandScene({
+  plan,
+  terrain,
+  sites,
+}: {
+  plan: HourPlan;
+  terrain: TerrainModel;
+  sites: Site[];
+}) {
   return (
-    <Canvas camera={{ position: [10.2, 5.2, 11.2], fov: 37 }} dpr={[1, 2]}>
+    <Canvas camera={{ position: [10.2, 5.4, 11.2], fov: 37 }} dpr={[1, 2]}>
       <color attach="background" args={["#080b11"]} />
-      <fog attach="fog" args={["#05070a", 22, 50]} />
-      <Scene plan={plan} />
+      <fog attach="fog" args={["#080b11", 22, 52]} />
+      <Scene plan={plan} terrain={terrain} sites={sites} />
     </Canvas>
   );
 }

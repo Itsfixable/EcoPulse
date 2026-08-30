@@ -9,7 +9,10 @@ import { applyScenario, BASE_SCENARIO, type Scenario } from "@/lib/scenario";
 import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
 import Assistant from "./Assistant";
+import IslandPicker, { type PresetIsland } from "./IslandPicker";
 import { Card, CardHead, Metric } from "./ui";
+import { buildTerrain, placeSites } from "./terrain";
+import type { HeightGrid } from "@/lib/elevation";
 import type { ForecastHour, IslandConfig } from "@/lib/types";
 
 const IslandScene = dynamic(() => import("./IslandScene"), {
@@ -26,13 +29,66 @@ const clock = (h: number) =>
 
 export default function Dashboard({
   island,
-  forecast,
+  forecast: initialForecast,
+  grid: initialGrid,
+  presets,
   live,
 }: {
   island: IslandConfig;
   forecast: ForecastHour[];
+  grid: HeightGrid;
+  presets: PresetIsland[];
   live: boolean;
 }) {
+  const [grid, setGrid] = useState(initialGrid);
+  const [forecast, setForecast] = useState(initialForecast);
+  const [placeName, setPlaceName] = useState(presets[0]?.name ?? island.name);
+  const [placeCountry, setPlaceCountry] = useState(presets[0]?.country ?? "");
+  const [islandBusy, setIslandBusy] = useState(false);
+  const [islandError, setIslandError] = useState<string | null>(null);
+  const [staleWeather, setStaleWeather] = useState(false);
+
+  const terrain = useMemo(() => buildTerrain(grid), [grid]);
+  const sites = useMemo(() => placeSites(terrain), [terrain]);
+
+  async function pickIsland(p: {
+    slug?: string;
+    name: string;
+    country: string;
+    lat: number;
+    lon: number;
+    span: number;
+  }) {
+    setIslandBusy(true);
+    setIslandError(null);
+    try {
+      // Presets ship with elevation already sampled; only a search costs API calls.
+      const url = p.slug
+        ? `/api/preset?slug=${p.slug}`
+        : `/api/island?lat=${p.lat}&lon=${p.lon}&span=${p.span ?? 16}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "could not load that island");
+      setGrid(data.grid);
+      if (data.forecast) {
+        setForecast(data.forecast);
+        setStaleWeather(false);
+      } else {
+        setStaleWeather(true);
+      }
+      setPlaceName(p.name);
+      setPlaceCountry(p.country);
+    } catch (e) {
+      setIslandError(
+        e instanceof Error && e.message.includes("429")
+          ? "Elevation service is rate-limited — try again in a minute."
+          : "Could not load that island.",
+      );
+    } finally {
+      setIslandBusy(false);
+    }
+  }
+
   const [hour, setHour] = useState(13);
   const [playing, setPlaying] = useState(false);
   const [scenario, setScenario] = useState<Scenario>(BASE_SCENARIO);
@@ -83,13 +139,19 @@ export default function Dashboard({
             E
           </span>
           <h1 className="text-md font-semibold text-primary">EcoPulse</h1>
-          <span className="hidden text-sm text-tertiary sm:inline">{island.name}</span>
+          <span className="hidden text-sm text-tertiary sm:inline">
+            {placeName}
+            {placeCountry ? `, ${placeCountry}` : ""}
+          </span>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-secondary ring-1 ring-secondary">
             <span
               className="size-1.5 rounded-full"
-              style={{ background: live ? "var(--color-brand-500)" : "var(--color-solar)" }}
+              style={{
+                background:
+                  staleWeather || !live ? "var(--color-solar)" : "var(--color-brand-500)",
+              }}
             />
-            {live ? "Live forecast" : "Cached forecast"}
+            {staleWeather ? "Weather service busy" : live ? "Live forecast" : "Cached forecast"}
           </span>
         </div>
       </header>
@@ -104,6 +166,16 @@ export default function Dashboard({
             water. EcoPulse reads the live weather forecast and schedules the whole island — hour
             by hour — so the clinic never goes dark and the tank never runs dry.
           </p>
+        </div>
+
+        <div className="mb-4">
+          <IslandPicker
+            presets={presets}
+            current={placeName}
+            busy={islandBusy}
+            error={islandError}
+            onPick={pickIsland}
+          />
         </div>
 
         <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -152,7 +224,7 @@ export default function Dashboard({
           <div className="flex flex-col gap-4 lg:col-span-8">
             <Card padded={false} className="overflow-hidden">
               <div className="relative h-[430px]">
-                <IslandScene plan={now} />
+                <IslandScene plan={now} terrain={terrain} sites={sites} />
                 <div className="pointer-events-none absolute left-4 top-4">
                   <p className="text-xs font-medium text-secondary">Island at {clock(hour)}</p>
                   <p className="mt-0.5 text-xs text-tertiary">{now.note}</p>
@@ -212,8 +284,13 @@ export default function Dashboard({
         </div>
 
         <footer className="mt-6 text-xs text-tertiary">
-          Weather is a live Open-Meteo forecast for Ta&apos;ū ({island.lat}, {island.lon}). Load
-          and hardware figures are modelled on published island-microgrid data.
+          {staleWeather
+            ? "Terrain updated, but the weather service was busy — the forecast shown is from the previous island. "
+            : ""}
+          Terrain is real elevation sampled from Open-Meteo at {grid.n}&times;{grid.n} points
+          across a {grid.spanKm} km box ({grid.lat.toFixed(3)}, {grid.lon.toFixed(3)}), peak{" "}
+          {Math.round(grid.max)} m. Weather is a live forecast for the same point. Load and
+          hardware figures are modelled on published island-microgrid data.
         </footer>
       </main>
     </div>

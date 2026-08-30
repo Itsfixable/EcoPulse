@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "tau",
+    "name": "Ta'\u016b",
+    "country": "American Samoa",
+    "lat": -14.235,
+    "lon": -169.455,
+    "span": 12,
+    "max": 942,
+    "landFraction": 0.2899305555555556
+  },
+  {
+    "slug": "santorini",
+    "name": "Santorini",
+    "country": "Greece",
+    "lat": 36.404,
+    "lon": 25.43,
+    "span": 20,
+    "max": 521,
+    "landFraction": 0.2048611111111111
+  },
+  {
+    "slug": "bora-bora",
+    "name": "Bora Bora",
+    "country": "French Polynesia",
+    "lat": -16.5,
+    "lon": -151.741,
+    "span": 14,
+    "max": 482,
+    "landFraction": 0.14930555555555555
+  }
+]
