@@ -2,10 +2,22 @@
 # Validates model API keys in .env.local without printing them.
 set -u
 cd "$(dirname "$0")/.."
-[ -f .env.local ] || { echo "No .env.local found."; exit 1; }
+# Keys come from .env.local locally and from the environment on hosts like
+# Replit, where secrets are injected as variables and no file exists.
+if [ -f .env.local ]; then
+  echo "Reading .env.local"
+else
+  echo "No .env.local; reading the environment (Replit Secrets land here)"
+fi
+echo
 
 read_key() {
-  awk -F= -v n="$1" '$1==n {v=substr($0,index($0,"=")+1); gsub(/^[ \t"\x27]+|[ \t"\x27\r]+$/,"",v); print v}' .env.local
+  local v=""
+  if [ -f .env.local ]; then
+    v="$(awk -F= -v n="$1" '$1==n {x=substr($0,index($0,"=")+1); gsub(/^[ \t"\x27]+|[ \t"\x27\r]+$/,"",x); print x}' .env.local)"
+  fi
+  [ -n "$v" ] || v="$(printenv "$1" 2>/dev/null || true)"
+  printf %s "$v"
 }
 
 check() {
@@ -58,4 +70,14 @@ check() {
   esac
 }
 
-for n in GEMINI_API_KEY OPENAI_API_KEY ANTHROPIC_API_KEY; do check "$n"; done
+found=0
+for n in GEMINI_API_KEY OPENAI_API_KEY ANTHROPIC_API_KEY; do
+  [ -n "$(read_key "$n")" ] && found=1
+  check "$n"
+done
+
+if [ "$found" -eq 0 ]; then
+  echo "No model key found in .env.local or the environment."
+  echo "On Replit: add GEMINI_API_KEY in the Secrets pane, then stop and re-run the Repl."
+  echo "Locally:   echo 'GEMINI_API_KEY=...' >> .env.local, then restart the dev server."
+fi
