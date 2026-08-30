@@ -68,7 +68,7 @@ body {
 /* Fraunces is the landing page's display face; using it for dashboard
    headings ties the two halves together without touching data type. */
 .display {
-  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
   font-weight: 600;
 }
 
@@ -100,7 +100,7 @@ body {
   background: #12163a;
   backdrop-filter: blur(10px) saturate(140%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   transition: background-color 360ms var(--motion-smooth), border-color 360ms var(--motion-smooth), box-shadow 360ms var(--motion-smooth);
 }
 
@@ -110,7 +110,7 @@ body {
   gap: 10px;
   text-decoration: none;
   color: var(--nav-cream);
-  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
   font-size: 24px;
   font-weight: 600;
   transition: color 240ms var(--motion-smooth), transform 240ms var(--motion-smooth);

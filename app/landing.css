@@ -2,8 +2,6 @@
    HTML/CSS. Scoped under .lp so it cannot collide with the dashboard's
    Untitled UI tokens. */
 
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&display=swap");
-
 .lp {
   --night: #12163a;
   --dusk: #2c1f57;
@@ -12,7 +10,7 @@
   --sea-green: #3ea86b;
   --cream: #f6f1e7;
 
-  font-family: "Inter", Arial, sans-serif;
+  font-family: var(--font-inter), Inter, Arial, sans-serif;
   background: linear-gradient(180deg, var(--night), var(--dusk) 70%);
   color: var(--cream);
   min-height: 100vh;
@@ -40,7 +38,7 @@
 }
 
 .lp nav h2 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-fraunces), Fraunces, ui-serif, Georgia, serif;
   font-size: 24px;
   font-weight: 600;
   margin: 0;
@@ -93,7 +91,7 @@
 }
 
 .lp .hero h1 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-fraunces), Fraunces, ui-serif, Georgia, serif;
   font-weight: 600;
   font-size: clamp(38px, 6vw, 64px);
   line-height: 1.05;
@@ -120,7 +118,7 @@
 .lp section { padding: 60px 8%; max-width: 1100px; margin: 0 auto; }
 
 .lp section h2 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-fraunces), Fraunces, ui-serif, Georgia, serif;
   font-size: 30px;
   font-weight: 600;
   margin: 12px 0 10px;
@@ -181,7 +179,7 @@
 .lp .issue-card p, .lp .solution-card p { font-size: 14px; line-height: 1.6; opacity: 0.8; margin: 0; }
 
 .lp .big-number {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-fraunces), Fraunces, ui-serif, Georgia, serif;
   font-size: 34px;
   font-weight: 600;
   margin: 6px 0 4px;
@@ -201,7 +199,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
 }
-.lp footer h3 { font-family: "Fraunces", serif; font-size: 20px; margin: 0 0 6px; }
+.lp footer h3 { font-family: var(--font-fraunces), Fraunces, ui-serif, Georgia, serif; font-size: 20px; margin: 0 0 6px; }
 .lp footer p { opacity: 0.7; margin: 0; font-size: 14px; }
 
 @media (max-width: 900px) {
@@ -249,7 +247,7 @@
   flex-direction: column;
   overflow: hidden;
   z-index: 2000;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: var(--font-inter), Inter, Arial, sans-serif;
   animation: chat-enter 380ms var(--motion-smooth) both;
 }
 

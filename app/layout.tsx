@@ -1,6 +1,22 @@
 import type { Metadata } from "next";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import SiteNav from "@/components/SiteNav";
+
+// Self-hosted by Next at build time: no external stylesheet, no render-blocking
+// request, and nothing injected into <head> at runtime for a proxy to collide with.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  display: "swap",
+  variable: "--font-fraunces",
+});
 
 export const metadata: Metadata = {
   title: "EcoPulse — island energy and water",
@@ -13,15 +29,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark-mode">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`dark-mode ${inter.variable} ${fraunces.variable}`}>
       <body>
         <SiteNav />
         {children}
