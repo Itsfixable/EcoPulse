@@ -614,3 +614,26 @@ body {
   border-color: color-mix(in srgb, var(--color-diesel) 60%, transparent);
   background: color-mix(in srgb, var(--color-diesel) 18%, transparent);
 }
+
+/* Lucide icons sit optically where the emoji used to. */
+.lp .card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  color: var(--accent, var(--gold));
+  border: 1px solid color-mix(in srgb, var(--accent, var(--gold)) 32%, transparent);
+  background: color-mix(in srgb, var(--accent, var(--gold)) 12%, transparent);
+}
+.lp .data-card h3,
+.lp footer h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+#chatbot-button { display: grid; place-items: center; }
+#chatbot .chat-header h3 { display: flex; align-items: center; gap: 6px; }
+#close-chat,
+#send-button { display: grid; place-items: center; }

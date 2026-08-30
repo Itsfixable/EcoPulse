@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Leaf, X, SendHorizontal } from "lucide-react";
 import { BASE_SCENARIO } from "@/lib/scenario";
 import { localEcoBotReply } from "@/lib/ecobot";
 import type { ForecastHour } from "@/lib/types";
@@ -11,7 +12,7 @@ interface Msg {
 }
 
 const GREETING =
-  "Hi! I'm EcoBot 🌍 Ask me about the island's energy and water plan. I read the solver's actual hourly output, so I can tell you why it made a decision, or what happens under a storm.";
+  "Hi, I'm EcoBot. Ask me about the island's energy and water plan. I read the solver's actual hourly output, so I can tell you why it made a decision, or what happens under a storm.";
 
 export default function EcoBot({ forecast }: { forecast: ForecastHour[] }) {
   const [open, setOpen] = useState(false);
@@ -66,18 +67,20 @@ export default function EcoBot({ forecast }: { forecast: ForecastHour[] }) {
         aria-label={open ? "Close EcoBot" : "Open EcoBot"}
         onClick={() => setOpen((o) => !o)}
       >
-        🌱
+        <Leaf size={26} strokeWidth={1.8} />
       </button>
 
       {open && (
         <div id="chatbot">
           <div className="chat-header">
             <div>
-              <h3>🌱 EcoBot</h3>
+              <h3>
+                <Leaf size={15} strokeWidth={2} /> EcoBot
+              </h3>
               <p>Reads the live dispatch plan</p>
             </div>
             <button id="close-chat" aria-label="Close chat" onClick={() => setOpen(false)}>
-              ×
+              <X size={18} strokeWidth={2} />
             </button>
           </div>
 
@@ -107,7 +110,7 @@ export default function EcoBot({ forecast }: { forecast: ForecastHour[] }) {
               aria-label="Ask EcoBot"
             />
             <button id="send-button" aria-label="Send" disabled={busy || !draft.trim()}>
-              ➤
+              <SendHorizontal size={16} strokeWidth={2} />
             </button>
           </form>
         </div>

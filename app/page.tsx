@@ -1,5 +1,17 @@
 import Link from "next/link";
 import "./landing.css";
+import {
+  Thermometer,
+  Zap,
+  Fuel,
+  Droplet,
+  Wind,
+  Waves,
+  BatteryCharging,
+  Clock,
+  Sprout,
+  Leaf,
+} from "lucide-react";
 import EcoBot from "@/components/EcoBot";
 import LandingMotion from "@/components/LandingMotion";
 import { TAU } from "@/lib/island";
@@ -61,24 +73,24 @@ export default async function Landing() {
       <section className="stats-wrap" style={{ paddingTop: 0 }}>
         <div className="stats">
           <div className="stat-card">
-            <span>🌡️</span>
+            <span className="card-icon"><Thermometer size={22} strokeWidth={1.6} /></span>
             <h3>Temperature today</h3>
             <p>
               {highF}°/{lowF}°F
             </p>
           </div>
           <div className="stat-card">
-            <span>⚡</span>
+            <span className="card-icon"><Zap size={22} strokeWidth={1.6} /></span>
             <h3>Renewable share</h3>
             <p>{renewablePct}%</p>
           </div>
           <div className="stat-card">
-            <span>🛢️</span>
+            <span className="card-icon"><Fuel size={22} strokeWidth={1.6} /></span>
             <h3>Diesel avoided</h3>
             <p>{dieselSaved} L</p>
           </div>
           <div className="stat-card">
-            <span>💧</span>
+            <span className="card-icon"><Droplet size={22} strokeWidth={1.6} /></span>
             <h3>Freshwater tank</h3>
             <p>{tankPct}%</p>
           </div>
@@ -95,22 +107,22 @@ export default async function Landing() {
 
         <div className="dashboard-grid">
           <div className="data-card">
-            <h3>🌡️ Temperature</h3>
+            <h3><Thermometer size={16} strokeWidth={1.8} /> Temperature</h3>
             <div className="big-number">{highF}°F</div>
             <p>Forecast high for Ta&apos;ū</p>
           </div>
           <div className="data-card">
-            <h3>⚡ Renewable share</h3>
+            <h3><Zap size={16} strokeWidth={1.8} /> Renewable share</h3>
             <div className="big-number">{renewablePct}%</div>
             <p>Of all energy served today</p>
           </div>
           <div className="data-card">
-            <h3>🌬️ CO₂ avoided</h3>
+            <h3><Wind size={16} strokeWidth={1.8} /> CO₂ avoided</h3>
             <div className="big-number">{co2Saved} kg</div>
             <p>Versus a fixed daily schedule</p>
           </div>
           <div className="data-card">
-            <h3>💧 Tank low point</h3>
+            <h3><Droplet size={16} strokeWidth={1.8} /> Tank low point</h3>
             <div className="status good">{tankLow} m³</div>
             <p>{plan.totals.tankRanDry ? "Ran dry today" : "Never ran dry"}</p>
           </div>
@@ -131,7 +143,7 @@ export default async function Landing() {
         <h2>Environmental Challenges</h2>
         <div className="issue-grid">
           <div className="issue-card">
-            <span>🛢️</span>
+            <span className="card-icon"><Fuel size={22} strokeWidth={1.6} /></span>
             <h3>Diesel Dependence</h3>
             <p>
               Remote islands ship in fuel by boat. It is expensive, it pollutes, and a delayed
@@ -139,7 +151,7 @@ export default async function Landing() {
             </p>
           </div>
           <div className="issue-card">
-            <span>💧</span>
+            <span className="card-icon"><Droplet size={22} strokeWidth={1.6} /></span>
             <h3>Water Costs Power</h3>
             <p>
               Desalination is the largest movable load on the island and its only source of fresh
@@ -147,7 +159,7 @@ export default async function Landing() {
             </p>
           </div>
           <div className="issue-card">
-            <span>🌊</span>
+            <span className="card-icon"><Waves size={22} strokeWidth={1.6} /></span>
             <h3>Rising Sea Levels</h3>
             <p>
               Rising oceans increase flooding and threaten the low-lying coastal ground where
@@ -162,7 +174,7 @@ export default async function Landing() {
         <h2>Possible Solutions</h2>
         <div className="solution-grid">
           <div className="solution-card">
-            <span>🔋</span>
+            <span className="card-icon"><BatteryCharging size={22} strokeWidth={1.6} /></span>
             <h3>Use Renewable Energy</h3>
             <p>
               Solar and wind already cover {renewablePct}% of the island&apos;s demand in
@@ -170,7 +182,7 @@ export default async function Landing() {
             </p>
           </div>
           <div className="solution-card">
-            <span>🕐</span>
+            <span className="card-icon"><Clock size={22} strokeWidth={1.6} /></span>
             <h3>Shift Load, Not People</h3>
             <p>
               Running desalination when the sun is strongest saves {dieselSaved} L of diesel today
@@ -178,7 +190,7 @@ export default async function Landing() {
             </p>
           </div>
           <div className="solution-card">
-            <span>🌱</span>
+            <span className="card-icon"><Sprout size={22} strokeWidth={1.6} /></span>
             <h3>Restore Ecosystems</h3>
             <p>
               Protect forests, mangroves and wetlands. Healthy coastlines absorb storm surge that
@@ -189,7 +201,7 @@ export default async function Landing() {
       </section>
 
       <footer>
-        <h3>🌿 EcoPulse</h3>
+        <h3><Leaf size={17} strokeWidth={1.8} /> EcoPulse</h3>
         <p>Working toward a healthier planet. Built at DreamHacks 2026, Georgia Tech.</p>
       </footer>
 
