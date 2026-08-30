@@ -158,9 +158,6 @@
   box-shadow: 0 18px 35px rgba(6, 8, 30, 0.22);
 }
 
-.lp .stat-card span,
-.lp .issue-card span,
-.lp .solution-card span { font-size: 30px; display: block; }
 
 .lp .stat-card h3,
 .lp .data-card h3,

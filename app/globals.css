@@ -616,7 +616,7 @@ body {
 }
 
 /* Lucide icons sit optically where the emoji used to. */
-.lp .card-icon {
+.lp span.card-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
