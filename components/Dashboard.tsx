@@ -304,13 +304,6 @@ export default function Dashboard({
               </div>
             </Card>
 
-            <Card>
-              <CardHead
-                title="Dispatch plan"
-                hint="Where every kilowatt comes from, and what it costs the water tank"
-              />
-              <Timeline plan={plan} island={island} hour={hour} onHour={setHour} />
-            </Card>
           </div>
 
           <div className="flex flex-col gap-4 lg:col-span-4">
@@ -396,6 +389,14 @@ export default function Dashboard({
             </Card>
           </div>
         </div>
+
+        <Card className="mt-4">
+          <CardHead
+            title="Dispatch plan"
+            hint="Where every kilowatt comes from, and what it costs the water tank"
+          />
+          <Timeline plan={plan} island={island} hour={hour} onHour={setHour} />
+        </Card>
 
       </main>
 

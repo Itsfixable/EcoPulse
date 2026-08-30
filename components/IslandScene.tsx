@@ -470,10 +470,10 @@ function Scene({
         ))}
 
       <OrbitControls
-        target={[0, 1.4, 0]}
+        target={[0, 1.05, 0]}
         enablePan={false}
-        minDistance={9}
-        maxDistance={28}
+        minDistance={8}
+        maxDistance={26}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 2.06}
         autoRotate
