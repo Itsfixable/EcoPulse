@@ -1,0 +1,296 @@
+/* EcoPulse landing page — team design, converted from the original
+   HTML/CSS. Scoped under .lp so it cannot collide with the dashboard's
+   Untitled UI tokens. */
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&display=swap");
+
+.lp {
+  --night: #12163a;
+  --dusk: #2c1f57;
+  --coral: #ff7a59;
+  --gold: #f4b860;
+  --sea-green: #3ea86b;
+  --cream: #f6f1e7;
+
+  font-family: "Inter", Arial, sans-serif;
+  background: linear-gradient(180deg, var(--night), var(--dusk) 70%);
+  color: var(--cream);
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+.lp * { box-sizing: border-box; }
+
+.lp nav {
+  min-height: 70px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 12px 8%;
+  background: rgba(18, 22, 58, 0.85);
+  backdrop-filter: blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lp nav h2 {
+  font-family: "Fraunces", serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.lp .nav-links { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
+
+.lp .nav-links a {
+  text-decoration: none;
+  color: var(--cream);
+  font-weight: 600;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.lp .nav-links a:hover { opacity: 1; color: var(--sea-green); }
+
+.lp .nav-cta {
+  background: var(--coral);
+  color: var(--night) !important;
+  padding: 8px 16px;
+  border-radius: 20px;
+  opacity: 1 !important;
+}
+.lp .nav-cta:hover { background: var(--gold); color: var(--night) !important; }
+
+.lp .hero {
+  min-height: 620px;
+  display: flex;
+  align-items: center;
+  padding: 80px 10%;
+  background:
+    linear-gradient(rgba(18, 22, 58, 0.78), rgba(44, 31, 87, 0.65)),
+    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e") center / cover;
+}
+
+.lp .hero-content { max-width: 680px; }
+
+.lp .subtitle,
+.lp .section-label {
+  letter-spacing: 3px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--gold);
+  margin: 0;
+}
+
+.lp .hero h1 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.05;
+  margin: 20px 0;
+}
+
+.lp .hero p { font-size: 19px; line-height: 1.6; opacity: 0.88; margin: 0; }
+
+.lp .buttons { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 30px; }
+
+.lp .primary-btn,
+.lp .secondary-btn {
+  padding: 14px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.lp .primary-btn { background: var(--coral); color: var(--night); }
+.lp .primary-btn:hover { background: var(--gold); transform: translateY(-1px); }
+.lp .secondary-btn { color: var(--cream); border: 1.5px solid rgba(255, 255, 255, 0.4); }
+.lp .secondary-btn:hover { border-color: var(--cream); transform: translateY(-1px); }
+
+.lp section { padding: 60px 8%; max-width: 1100px; margin: 0 auto; }
+
+.lp section h2 {
+  font-family: "Fraunces", serif;
+  font-size: 30px;
+  font-weight: 600;
+  margin: 12px 0 10px;
+}
+.lp section > p { opacity: 0.82; line-height: 1.6; margin: 0; }
+
+/* The original CSS never set columns outside the mobile query, so these
+   grids collapsed to a single column on desktop. */
+.lp .stats,
+.lp .dashboard-grid,
+.lp .issue-grid,
+.lp .solution-grid {
+  display: grid;
+  gap: 20px;
+  margin-top: 32px;
+}
+.lp .stats, .lp .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
+.lp .issue-grid, .lp .solution-grid { grid-template-columns: repeat(3, 1fr); }
+
+.lp .stat-card,
+.lp .data-card,
+.lp .issue-card,
+.lp .solution-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.lp .stat-card span,
+.lp .issue-card span,
+.lp .solution-card span { font-size: 30px; display: block; }
+
+.lp .stat-card h3,
+.lp .data-card h3,
+.lp .issue-card h3,
+.lp .solution-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 10px 0 6px;
+}
+
+.lp .stat-card p { font-size: 22px; font-weight: 600; margin: 0; opacity: 1; }
+.lp .issue-card p, .lp .solution-card p { font-size: 14px; line-height: 1.6; opacity: 0.8; margin: 0; }
+
+.lp .big-number {
+  font-family: "Fraunces", serif;
+  font-size: 34px;
+  font-weight: 600;
+  margin: 6px 0 4px;
+}
+.lp .data-card > p { font-size: 13px; opacity: 0.7; margin: 0; }
+.lp .status.good { color: var(--sea-green); font-size: 26px; font-weight: 700; margin: 6px 0 4px; }
+
+.lp .source-note {
+  margin-top: 28px;
+  font-size: 13px;
+  opacity: 0.65;
+  line-height: 1.6;
+}
+
+.lp footer {
+  padding: 50px 8% 70px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+.lp footer h3 { font-family: "Fraunces", serif; font-size: 20px; margin: 0 0 6px; }
+.lp footer p { opacity: 0.7; margin: 0; font-size: 14px; }
+
+@media (max-width: 900px) {
+  .lp .stats, .lp .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  .lp .issue-grid, .lp .solution-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .lp .nav-links { gap: 14px; font-size: 14px; }
+  .lp .stats, .lp .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- EcoBot ---- */
+#chatbot-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 62px;
+  height: 62px;
+  border: none;
+  border-radius: 50%;
+  background: #3b8c4a;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.35);
+  z-index: 2000;
+}
+#chatbot-button:hover { background: #46a457; }
+
+#chatbot {
+  position: fixed;
+  bottom: 100px;
+  right: 25px;
+  width: 352px;
+  max-width: calc(100vw - 32px);
+  height: 500px;
+  max-height: calc(100vh - 140px);
+  background: #10131c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2000;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+#chatbot .chat-header {
+  background: #17351f;
+  color: #fff;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#chatbot .chat-header h3 { margin: 0; font-size: 16px; }
+#chatbot .chat-header p { margin: 4px 0 0; font-size: 12px; opacity: 0.7; }
+#close-chat { background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; line-height: 1; }
+
+#chat-messages {
+  flex: 1;
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#chatbot .bot-message,
+#chatbot .user-message {
+  padding: 11px 14px;
+  border-radius: 14px;
+  max-width: 85%;
+  line-height: 1.5;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+/* The original set a black bubble with default dark text, which rendered
+   invisible. Light text on a dark bubble instead. */
+#chatbot .bot-message { background: #1c2230; color: #e8eef5; align-self: flex-start; }
+#chatbot .user-message { background: #3b8c4a; color: #fff; align-self: flex-end; }
+#chatbot .typing { opacity: 0.6; }
+
+#chatbot .chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+#user-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  outline: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e8eef5;
+}
+#user-input::placeholder { color: rgba(232, 238, 245, 0.45); }
+#send-button {
+  border: none;
+  background: #3b8c4a;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+#send-button:disabled { opacity: 0.45; cursor: not-allowed; }
