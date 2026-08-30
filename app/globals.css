@@ -6,34 +6,63 @@
 
 @custom-variant dark (&:where(.dark-mode, .dark-mode *));
 
+/* Energy sources, drawn from the team's landing palette so the dashboard
+   charts and the marketing page read as one product. */
 @theme {
-  --color-solar: #f4a63c;
-  --color-wind: #37bfa4;
-  --color-battery: #7d8ff7;
-  --color-diesel: #d8674a;
-  --color-water: #45a5d8;
+  --color-solar: #f4b860;   /* gold */
+  --color-wind: #3ea86b;    /* sea-green */
+  --color-battery: #8f7fd4; /* dusk */
+  --color-diesel: #ff7a59;  /* coral */
+  --color-water: #5aa9d6;
 }
 
+/* The team's brand green (--sea-green) as the Untitled UI brand ramp. */
 :root {
-  --color-brand-50: rgb(236 253 245);
-  --color-brand-100: rgb(209 250 229);
-  --color-brand-200: rgb(167 243 208);
-  --color-brand-300: rgb(110 231 183);
-  --color-brand-400: rgb(52 211 153);
-  --color-brand-500: rgb(16 185 129);
-  --color-brand-600: rgb(5 150 105);
-  --color-brand-700: rgb(4 120 87);
-  --color-brand-800: rgb(6 95 70);
-  --color-brand-900: rgb(6 78 59);
-  --color-brand-950: rgb(2 44 34);
+  --color-brand-25: #f2fbf6;
+  --color-brand-50: #e6f7ee;
+  --color-brand-100: #c6ecd8;
+  --color-brand-200: #9adcbb;
+  --color-brand-300: #6ec99c;
+  --color-brand-400: #52b984;
+  --color-brand-500: #3ea86b;
+  --color-brand-600: #33905b;
+  --color-brand-700: #2a7449;
+  --color-brand-800: #215839;
+  --color-brand-900: #17402a;
+  --color-brand-950: #0d2418;
+}
+
+/* Untitled UI routes every surface, text and border token through the
+   neutral scale, so retinting that one scale to the landing page's night
+   and dusk navies carries the whole dashboard across. */
+.dark-mode {
+  --color-neutral-25: #fbf9f4;
+  --color-neutral-50: #f6f1e7;  /* cream — primary text */
+  --color-neutral-100: #e5e0d6;
+  --color-neutral-200: #cdc9c2;
+  --color-neutral-300: #a9adc4;  /* secondary text */
+  --color-neutral-400: #7f85a4;  /* tertiary text */
+  --color-neutral-500: #5f668a;
+  --color-neutral-600: #454c74;
+  --color-neutral-700: #333a63;  /* strong borders */
+  --color-neutral-800: #252b52;  /* hairlines */
+  --color-neutral-900: #12163a;  /* page — the team's --night */
+  --color-neutral-950: #171c47;  /* cards, a step above the page */
 }
 
 html {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-secondary);
 }
 
 body {
   font-feature-settings: "tnum" 1, "cv01" 1;
+}
+
+/* Fraunces is the landing page's display face; using it for dashboard
+   headings ties the two halves together without touching data type. */
+.display {
+  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-weight: 600;
 }
 
 .tnum {

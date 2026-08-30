@@ -137,7 +137,7 @@ export default function Dashboard({
       <header className="sticky top-0 z-30 border-b border-secondary bg-primary/85 backdrop-blur">
         <div className="mx-auto flex max-w-[1480px] flex-wrap items-center gap-x-3 gap-y-2 px-6 py-3">
           <Logo size={28} />
-          <h1 className="text-md font-semibold text-primary">EcoPulse</h1>
+          <h1 className="display text-lg text-primary">EcoPulse</h1>
           <span className="hidden text-sm text-tertiary sm:inline">
             {placeName}
             {placeCountry ? `, ${placeCountry}` : ""}
@@ -157,7 +157,7 @@ export default function Dashboard({
 
       <main className="mx-auto max-w-[1480px] px-6 py-6">
         <div className="mb-6 max-w-3xl">
-          <p className="text-xl leading-snug font-medium tracking-tight text-primary sm:text-display-xs">
+          <p className="display text-xl leading-snug text-primary sm:text-display-xs">
             On an island, electricity and drinking water are the same resource.
           </p>
           <p className="mt-2 text-sm text-tertiary">
