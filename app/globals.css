@@ -52,6 +52,16 @@
 
 html {
   background-color: var(--color-bg-secondary);
+  scroll-behavior: smooth;
+}
+
+/* Anchors land below the sticky nav rather than under it. */
+section[id] {
+  scroll-margin-top: 96px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 body {
@@ -125,26 +135,52 @@ body {
 }
 
 .site-nav-links a {
+  position: relative;
   text-decoration: none;
   color: var(--nav-cream);
   font-weight: 600;
   font-size: 15px;
   opacity: 0.85;
-  transition: opacity 260ms var(--motion-smooth), color 260ms var(--motion-smooth), transform 260ms var(--motion-smooth);
-}
-.site-nav-links a:hover { opacity: 1; color: var(--nav-green); transform: translateY(-1px); }
-.site-nav-links a[aria-current="page"] { opacity: 1; color: var(--nav-gold); }
-
-.site-nav-cta {
-  background: var(--nav-coral);
-  color: var(--nav-night) !important;
-  padding: 8px 16px;
+  padding: 7px 14px;
   border-radius: 20px;
-  opacity: 1 !important;
-  transition: background-color 280ms var(--motion-smooth), color 280ms var(--motion-smooth), box-shadow 280ms var(--motion-smooth), transform 280ms var(--motion-smooth);
+  border: 1px solid transparent;
+  transition: opacity 260ms var(--motion-smooth), color 260ms var(--motion-smooth),
+    background-color 260ms var(--motion-smooth), border-color 260ms var(--motion-smooth),
+    transform 260ms var(--motion-smooth), box-shadow 260ms var(--motion-smooth);
 }
-.site-nav-cta:hover { background: var(--nav-gold); color: var(--nav-night) !important; box-shadow: 0 8px 22px rgba(244, 184, 96, 0.22); transform: translateY(-2px); }
-.site-nav-cta[aria-current="page"] { background: var(--nav-gold); color: var(--nav-night) !important; }
+.site-nav-links a:hover {
+  opacity: 1;
+  color: var(--nav-green);
+  background: rgba(246, 241, 231, 0.07);
+  transform: translateY(-1px);
+}
+
+/* Only the page the reader is actually on carries the filled accent. */
+.site-nav-links a[aria-current="page"] {
+  opacity: 1;
+  color: var(--nav-night);
+  background: var(--nav-coral);
+  border-color: var(--nav-coral);
+  box-shadow: 0 8px 22px rgba(255, 122, 89, 0.26);
+}
+.site-nav-links a[aria-current="page"]:hover {
+  color: var(--nav-night);
+  background: var(--nav-gold);
+  border-color: var(--nav-gold);
+  box-shadow: 0 8px 22px rgba(244, 184, 96, 0.28);
+  transform: translateY(-2px);
+}
+
+/* "Live dashboard" is a destination, so it is outlined until you are on it. */
+.site-nav-cta:not([aria-current="page"]) {
+  color: var(--nav-coral);
+  border-color: rgba(255, 122, 89, 0.5);
+}
+.site-nav-cta:not([aria-current="page"]):hover {
+  color: var(--nav-coral);
+  background: rgba(255, 122, 89, 0.14);
+  border-color: var(--nav-coral);
+}
 
 @media (max-width: 560px) {
   .site-nav { padding: 12px 5%; }
@@ -158,4 +194,17 @@ body {
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
   }
+}
+
+/* Reading progress along the bottom edge of the nav. */
+.scroll-progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--nav-green), var(--nav-gold), var(--nav-coral));
+  pointer-events: none;
 }

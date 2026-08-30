@@ -326,3 +326,120 @@
   from { opacity: 0; transform: translateY(14px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ============================================================
+   Panels — depth and a per-section accent, replacing the flat
+   5%-white boxes the cards started as.
+   ============================================================ */
+
+.lp .stats { --accent: var(--gold); }
+.lp .dashboard-grid { --accent: var(--sea-green); }
+.lp .issue-grid { --accent: var(--coral); }
+.lp .solution-grid { --accent: var(--sea-green); }
+
+.lp .stat-card,
+.lp .data-card,
+.lp .issue-card,
+.lp .solution-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(246, 241, 231, 0.12);
+  background:
+    linear-gradient(158deg, rgba(246, 241, 231, 0.085) 0%, rgba(246, 241, 231, 0.022) 58%),
+    rgba(18, 22, 58, 0.55);
+  box-shadow: 0 1px 0 rgba(246, 241, 231, 0.06) inset,
+    0 10px 30px rgba(4, 6, 24, 0.28);
+}
+
+/* Hairline of light along the top edge. */
+.lp .stat-card::before,
+.lp .data-card::before,
+.lp .issue-card::before,
+.lp .solution-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(246, 241, 231, 0.42),
+    transparent
+  );
+  opacity: 0.7;
+}
+
+/* Accent wash that warms up on hover. */
+.lp .stat-card::after,
+.lp .data-card::after,
+.lp .issue-card::after,
+.lp .solution-card::after {
+  content: "";
+  position: absolute;
+  inset: -40% -40% auto -40%;
+  height: 150%;
+  z-index: -1;
+  background: radial-gradient(
+    52% 60% at 50% 0%,
+    color-mix(in srgb, var(--accent, var(--gold)) 26%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 420ms var(--motion-smooth);
+}
+
+.lp .stat-card:hover::after,
+.lp .data-card:hover::after,
+.lp .issue-card:hover::after,
+.lp .solution-card:hover::after {
+  opacity: 1;
+}
+
+.lp .stat-card:hover,
+.lp .data-card:hover,
+.lp .issue-card:hover,
+.lp .solution-card:hover {
+  border-color: color-mix(in srgb, var(--accent, var(--gold)) 45%, transparent);
+  box-shadow: 0 1px 0 rgba(246, 241, 231, 0.1) inset,
+    0 22px 44px rgba(4, 6, 24, 0.42);
+}
+
+/* Numbers pick up their section's accent. */
+.lp .stat-card p,
+.lp .big-number {
+  color: var(--accent, var(--cream));
+}
+
+.lp .issue-card span,
+.lp .solution-card span,
+.lp .stat-card span {
+  filter: drop-shadow(0 4px 10px rgba(4, 6, 24, 0.5));
+}
+
+/* ---- Slow aurora behind the page, so the background is not dead flat ---- */
+.lp {
+  position: relative;
+}
+.lp::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(48% 38% at 18% 12%, rgba(62, 168, 107, 0.16), transparent 62%),
+    radial-gradient(42% 34% at 82% 26%, rgba(255, 122, 89, 0.13), transparent 64%),
+    radial-gradient(54% 42% at 50% 92%, rgba(140, 108, 214, 0.16), transparent 66%);
+  animation: aurora 26s ease-in-out infinite alternate;
+}
+
+@keyframes aurora {
+  from { transform: translate3d(-2%, -1%, 0) scale(1); }
+  to { transform: translate3d(2%, 2%, 0) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp::before { animation: none; }
+}

@@ -46,6 +46,31 @@ export default function LandingMotion() {
         );
       }
 
+      // Hero background drifts slower than the page, giving the fold depth.
+      const hero = document.querySelector<HTMLElement>(".lp .hero");
+      if (hero) {
+        gsap.to(hero, {
+          backgroundPositionY: "28%",
+          ease: "none",
+          scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: 0.6 },
+        });
+      }
+
+      // Reading-progress bar across the top of the nav.
+      const bar = document.querySelector<HTMLElement>(".scroll-progress");
+      if (bar) {
+        gsap.fromTo(
+          bar,
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            ease: "none",
+            transformOrigin: "left center",
+            scrollTrigger: { start: 0, end: () => document.body.scrollHeight - window.innerHeight, scrub: 0.25 },
+          },
+        );
+      }
+
       for (const el of gsap.utils.toArray<HTMLElement>(
         ".lp .section-label, .lp section > h2",
       )) {

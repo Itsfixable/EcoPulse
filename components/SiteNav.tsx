@@ -47,6 +47,7 @@ export default function SiteNav() {
 
   return (
     <nav className="site-nav">
+      <span className="scroll-progress" aria-hidden="true" />
       <Link href="/" className="site-nav-brand" aria-label="EcoPulse home">
         <Logo size={30} />
         <span>EcoPulse</span>
