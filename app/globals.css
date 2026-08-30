@@ -2,7 +2,6 @@
 @import "../styles/theme.css";
 
 @plugin "tailwindcss-animate";
-@plugin "tailwindcss-react-aria-components";
 
 @custom-variant dark (&:where(.dark-mode, .dark-mode *));
 
