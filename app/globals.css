@@ -1,26 +1,41 @@
 @import "tailwindcss";
+@import "../styles/theme.css";
+
+@plugin "tailwindcss-animate";
+@plugin "tailwindcss-react-aria-components";
+
+@custom-variant dark (&:where(.dark-mode, .dark-mode *));
+
+@theme {
+  --color-solar: #f4a63c;
+  --color-wind: #37bfa4;
+  --color-battery: #7d8ff7;
+  --color-diesel: #d8674a;
+  --color-water: #45a5d8;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-brand-50: rgb(236 253 245);
+  --color-brand-100: rgb(209 250 229);
+  --color-brand-200: rgb(167 243 208);
+  --color-brand-300: rgb(110 231 183);
+  --color-brand-400: rgb(52 211 153);
+  --color-brand-500: rgb(16 185 129);
+  --color-brand-600: rgb(5 150 105);
+  --color-brand-700: rgb(4 120 87);
+  --color-brand-800: rgb(6 95 70);
+  --color-brand-900: rgb(6 78 59);
+  --color-brand-950: rgb(2 44 34);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: var(--color-bg-primary);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "tnum" 1, "cv01" 1;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
