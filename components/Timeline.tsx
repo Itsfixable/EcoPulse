@@ -33,31 +33,35 @@ export default function Timeline({
 
   useGSAP(
     () => {
-      const cols = gsap.utils.toArray<SVGGElement>(".hour-col");
-      if (cols.length) {
-        gsap.from(cols, {
-          scaleY: 0,
-          transformOrigin: "50% 100%",
-          duration: 0.72,
-          ease: "power3.out",
-          stagger: 0.024,
-        });
-      }
-      const line = svgRef.current?.querySelector<SVGPathElement>(".tank-line");
-      if (line) {
-        const len = line.getTotalLength();
-        gsap.fromTo(
-          line,
-          { strokeDasharray: len, strokeDashoffset: len },
-          {
-            strokeDashoffset: 0,
-            duration: 1.15,
-            delay: 0.25,
-            ease: "power2.inOut",
-            onComplete: () => line.removeAttribute("stroke-dasharray"),
-          },
-        );
-      }
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const cols = gsap.utils.toArray<SVGGElement>(".hour-col");
+        if (cols.length) {
+          gsap.from(cols, {
+            scaleY: 0,
+            transformOrigin: "50% 100%",
+            duration: 0.72,
+            ease: "power3.out",
+            stagger: 0.024,
+          });
+        }
+        const line = svgRef.current?.querySelector<SVGPathElement>(".tank-line");
+        if (line) {
+          const len = line.getTotalLength();
+          gsap.fromTo(
+            line,
+            { strokeDasharray: len, strokeDashoffset: len },
+            {
+              strokeDashoffset: 0,
+              duration: 1.15,
+              delay: 0.25,
+              ease: "power2.inOut",
+              onComplete: () => line.removeAttribute("stroke-dasharray"),
+            },
+          );
+        }
+      });
+      return () => mm.revert();
     },
     { scope: svgRef, dependencies: [plan.label, plan.totals.dieselL, plan.totals.tankMinM3] },
   );

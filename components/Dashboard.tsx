@@ -108,14 +108,18 @@ export default function Dashboard({
   const shell = useRef<HTMLDivElement>(null);
   useGSAP(
     () => {
-      const cards = gsap.utils.toArray<HTMLElement>(".metric-card");
-      if (cards.length) {
-        gsap.fromTo(
-          cards,
-          { y: 8, opacity: 0.35 },
-          { y: 0, opacity: 1, duration: 0.72, ease: "power3.out", stagger: 0.08 },
-        );
-      }
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const cards = gsap.utils.toArray<HTMLElement>(".metric-card");
+        if (cards.length) {
+          gsap.fromTo(
+            cards,
+            { y: 8, opacity: 0.35 },
+            { y: 0, opacity: 1, duration: 0.72, ease: "power3.out", stagger: 0.08 },
+          );
+        }
+      });
+      return () => mm.revert();
     },
     { scope: shell, dependencies: [plan.totals.dieselL, order.join(",")] },
   );
