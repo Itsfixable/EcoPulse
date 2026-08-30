@@ -23,11 +23,14 @@ export default function Timeline({
   island,
   hour,
   onHour,
+  changedHours = [],
 }: {
   plan: DispatchPlan;
   island: IslandConfig;
   hour: number;
   onHour: (h: number) => void;
+  /** Hours where optimising changes what the island does. */
+  changedHours?: number[];
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -138,6 +141,21 @@ export default function Timeline({
             </g>
           );
         })}
+
+        {changedHours.map((h) => (
+          <rect
+            key={`chg-${h}`}
+            x={PAD_L + h * bw + bw * 0.16}
+            y={PAD_T + gh + 3}
+            width={bw * 0.68}
+            height={2.5}
+            rx={1.25}
+            fill="var(--color-brand-500)"
+            opacity={0.85}
+          >
+            <title>Optimising changes this hour</title>
+          </rect>
+        ))}
 
         <path className="tank-line" d={tankPath} fill="none" stroke="var(--color-water)" strokeWidth={1.8} strokeLinejoin="round" />
 

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { compare } from "@/lib/dispatch";
+import { compare, findBestOrder } from "@/lib/dispatch";
 import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
 import IslandPicker, { type PresetIsland } from "./IslandPicker";
@@ -110,8 +110,43 @@ export default function Dashboard({
   );
   const outageHours = cmp.ecopulse.totals.criticalOutageHours;
 
+  // Exhaustive search over all 5040 orderings, roughly 120 ms, so "Optimise"
+  // applies the genuinely best order rather than a heuristic guess.
+  const bestOrder = useMemo(
+    () => findBestOrder(island, forecast).order,
+    [island, forecast],
+  );
   const isDefault = order.join() === defaultOrder.join();
+  const isBestOrder = order.join() === bestOrder.join();
   const plan = optimized ? cmp.ecopulse : cmp.naive;
+
+  // The two plans agree for most of the day; they diverge only in the hours
+  // where the fixed schedule runs a deferrable load the weather cannot cover.
+  // Knowing which hours those are lets the toggle take the reader to one.
+  const changedHours = useMemo(() => {
+    const out: number[] = [];
+    for (let h = 0; h < 24; h++) {
+      const n = cmp.naive.hours[h];
+      const e = cmp.ecopulse.hours[h];
+      if (
+        n.servedLoadIds.join() !== e.servedLoadIds.join() ||
+        Math.abs(n.dieselKw - e.dieselKw) > 1
+      ) {
+        out.push(h);
+      }
+    }
+    return out;
+  }, [cmp]);
+
+  const biggestChange = useMemo(() => {
+    if (!changedHours.length) return null;
+    return changedHours.reduce((best, h) =>
+      Math.abs(cmp.naive.hours[h].dieselKw - cmp.ecopulse.hours[h].dieselKw) >
+      Math.abs(cmp.naive.hours[best].dieselKw - cmp.ecopulse.hours[best].dieselKw)
+        ? h
+        : best,
+    );
+  }, [changedHours, cmp]);
   const now = plan.hours[hourIndex];
 
   useEffect(() => {
@@ -202,12 +237,25 @@ export default function Dashboard({
               {optimized
                 ? `${Math.round(cmp.ecopulse.totals.dieselL)} L of diesel, ${Math.round(cmp.dieselSavedPct)}% less than the island burns today.`
                 : `${Math.round(cmp.naive.totals.dieselL)} L of diesel. Desalination runs 8am to 6pm whatever the weather is doing.`}
+              {changedHours.length > 0 && (
+                <span className="optimize-hours">
+                  {" "}
+                  {optimized ? "Changed" : "Would change"} {changedHours.length} hour
+                  {changedHours.length === 1 ? "" : "s"} of the day.
+                </span>
+              )}
             </p>
           </div>
           <button
             type="button"
             className="optimize-button"
-            onClick={() => setOptimized((o) => !o)}
+            onClick={() => {
+              setOptimized((o) => !o);
+              // Land on an hour where the plans actually differ, otherwise the
+              // island and the load list look unchanged and the button seems
+              // to have done nothing.
+              if (biggestChange !== null) setHour(biggestChange);
+            }}
             aria-pressed={optimized}
           >
             {optimized ? "Show the fixed schedule" : "Optimise the day"}
@@ -331,14 +379,24 @@ export default function Dashboard({
                 title="Who gets power first"
                 hint="Drag a row, or focus one and use the arrow keys. The whole day re-solves as you move it."
                 action={
-                  <button
-                    type="button"
-                    className="priority-reset"
-                    onClick={() => setOrder(defaultOrder)}
-                    disabled={isDefault}
-                  >
-                    Reset order
-                  </button>
+                  <div className="priority-actions">
+                    <button
+                      type="button"
+                      className="priority-reset"
+                      onClick={() => setOrder(defaultOrder)}
+                      disabled={isDefault}
+                    >
+                      Reset to default
+                    </button>
+                    <button
+                      type="button"
+                      className="priority-optimise"
+                      onClick={() => setOrder(bestOrder)}
+                      disabled={isBestOrder}
+                    >
+                      {isBestOrder ? "Optimised" : "Optimise"}
+                    </button>
+                  </div>
                 }
               />
               <ul className="priority-legend" aria-label="What the icon colours mean">
@@ -403,7 +461,7 @@ export default function Dashboard({
             title="Dispatch plan"
             hint="Where every kilowatt comes from, and what it costs the water tank"
           />
-          <Timeline plan={plan} island={island} hour={hour} onHour={setHour} />
+          <Timeline plan={plan} island={island} hour={hour} onHour={setHour} changedHours={changedHours} />
         </Card>
 
       </main>
