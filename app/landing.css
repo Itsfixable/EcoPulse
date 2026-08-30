@@ -294,3 +294,5 @@
   flex-shrink: 0;
 }
 #send-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.lp .wordmark { display: flex; align-items: center; gap: 10px; }

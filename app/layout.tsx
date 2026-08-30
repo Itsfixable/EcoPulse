@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "EcoPulse — island microgrid control",
+  title: "EcoPulse — island energy and water",
   description:
-    "On an island, electricity and drinking water are the same resource. EcoPulse plans the day.",
+    "On an island, electricity and drinking water are the same resource. EcoPulse reads the live forecast and plans the whole island, hour by hour.",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({

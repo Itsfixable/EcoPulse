@@ -10,6 +10,7 @@ import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
 import Assistant from "./Assistant";
 import IslandPicker, { type PresetIsland } from "./IslandPicker";
+import Logo from "./Logo";
 import { Card, CardHead, Metric } from "./ui";
 import { buildTerrain, placeSites } from "./terrain";
 import type { HeightGrid } from "@/lib/elevation";
@@ -135,9 +136,7 @@ export default function Dashboard({
     <div ref={shell} className="min-h-screen bg-secondary">
       <header className="sticky top-0 z-30 border-b border-secondary bg-primary/85 backdrop-blur">
         <div className="mx-auto flex max-w-[1480px] flex-wrap items-center gap-x-3 gap-y-2 px-6 py-3">
-          <span className="flex size-7 items-center justify-center rounded-md bg-brand-solid text-sm font-bold text-white">
-            E
-          </span>
+          <Logo size={28} />
           <h1 className="text-md font-semibold text-primary">EcoPulse</h1>
           <span className="hidden text-sm text-tertiary sm:inline">
             {placeName}
