@@ -53,6 +53,7 @@ export function Metric({
   unit,
   sub,
   tone = "neutral",
+  accent = "var(--color-brand-500)",
 }: {
   label: string;
   value: number;
@@ -60,26 +61,24 @@ export function Metric({
   unit?: string;
   sub: string;
   tone?: "good" | "warn" | "neutral";
+  accent?: string;
 }) {
   const countRef = useCountUp(value, decimals);
   return (
-    <div className="metric-card rounded-xl bg-primary p-4 ring-1 ring-secondary shadow-xs">
-      <p className="text-xs font-medium text-tertiary">{label}</p>
-      <p className="mt-1.5 flex items-baseline gap-1">
-        <span
-          ref={countRef}
-          className="tnum text-3xl font-semibold tracking-tight text-primary"
-        >
+    <div className="metric-card" style={{ ["--accent" as string]: accent }}>
+      <span className="metric-rule" aria-hidden="true" />
+      <p className="metric-label">{label}</p>
+      <p className="metric-value">
+        <span ref={countRef} className="tnum">
           {value.toFixed(decimals)}
         </span>
-        {unit && <span className="text-sm text-tertiary">{unit}</span>}
+        {unit && <span className="metric-unit">{unit}</span>}
       </p>
       <p
         className={cx(
-          "mt-1 text-xs",
+          "metric-sub",
           tone === "good" && "text-success-primary",
           tone === "warn" && "text-warning-primary",
-          tone === "neutral" && "text-tertiary",
         )}
       >
         {sub}

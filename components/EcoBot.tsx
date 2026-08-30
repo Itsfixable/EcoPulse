@@ -11,7 +11,7 @@ interface Msg {
 }
 
 const GREETING =
-  "Hi! I'm EcoBot 🌍 Ask me about the island's energy and water plan — I read the solver's actual hourly output, so I can tell you why it made a decision, or what happens under a storm.";
+  "Hi! I'm EcoBot 🌍 Ask me about the island's energy and water plan. I read the solver's actual hourly output, so I can tell you why it made a decision, or what happens under a storm.";
 
 export default function EcoBot({ forecast }: { forecast: ForecastHour[] }) {
   const [open, setOpen] = useState(false);

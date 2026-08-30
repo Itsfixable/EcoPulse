@@ -1,4 +1,4 @@
-/* EcoPulse landing page — team design, converted from the original
+/* EcoPulse landing page. Team design, converted from the original
    HTML/CSS. Scoped under .lp so it cannot collide with the dashboard's
    Untitled UI tokens. */
 
@@ -208,127 +208,16 @@
 }
 
 /* ---- EcoBot ---- */
-#chatbot-button {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 62px;
-  height: 62px;
-  border: none;
-  border-radius: 50%;
-  background: #3b8c4a;
-  color: #fff;
-  font-size: 28px;
-  cursor: pointer;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.35);
-  z-index: 2000;
-  transition: transform 300ms var(--motion-smooth), background-color 300ms var(--motion-smooth), box-shadow 300ms var(--motion-smooth);
-}
-#chatbot-button:hover { background: #46a457; box-shadow: 0 11px 28px rgba(59, 140, 74, 0.4); transform: translateY(-4px) scale(1.04); }
-#chatbot-button:active { transform: translateY(-1px) scale(0.96); }
 
-#chatbot {
-  position: fixed;
-  bottom: 100px;
-  right: 25px;
-  width: 352px;
-  max-width: calc(100vw - 32px);
-  height: 500px;
-  max-height: calc(100vh - 140px);
-  background: #10131c;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 2000;
-  font-family: var(--font-inter), Inter, Arial, sans-serif;
-  animation: chat-enter 380ms var(--motion-smooth) both;
-}
-
-#chatbot .chat-header {
-  background: #17351f;
-  color: #fff;
-  padding: 16px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-#chatbot .chat-header h3 { margin: 0; font-size: 16px; }
-#chatbot .chat-header p { margin: 4px 0 0; font-size: 12px; opacity: 0.7; }
-#close-chat { background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; line-height: 1; }
-
-#chat-messages {
-  flex: 1;
-  padding: 18px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-#chatbot .bot-message,
-#chatbot .user-message {
-  padding: 11px 14px;
-  border-radius: 14px;
-  max-width: 85%;
-  line-height: 1.5;
-  font-size: 14px;
-  white-space: pre-wrap;
-}
-/* The original set a black bubble with default dark text, which rendered
-   invisible. Light text on a dark bubble instead. */
-#chatbot .bot-message { background: #1c2230; color: #e8eef5; align-self: flex-start; }
-#chatbot .user-message { background: #3b8c4a; color: #fff; align-self: flex-end; }
-#chatbot .typing { opacity: 0.6; }
-
-#chatbot .chat-input {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-#user-input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  outline: none;
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #e8eef5;
-}
-#user-input::placeholder { color: rgba(232, 238, 245, 0.45); }
-#send-button {
-  border: none;
-  background: #3b8c4a;
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: transform 220ms var(--motion-smooth), background-color 220ms var(--motion-smooth);
-}
-#send-button:not(:disabled):hover { background: #46a457; transform: scale(1.08); }
-#send-button:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.lp .wordmark { display: flex; align-items: center; gap: 10px; }
+/* The original set a black bubble with default dark text, which .lp .wordmark { display: flex; align-items: center; gap: 10px; }
 
 @keyframes landing-reveal {
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes chat-enter {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 /* ============================================================
-   Panels — depth and a per-section accent, replacing the flat
+   Panels: depth and a per-section accent, replacing the flat
    5%-white boxes the cards started as.
    ============================================================ */
 

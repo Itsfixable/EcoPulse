@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "EcoPulse — island energy and water",
+  title: "EcoPulse: island energy and water",
   description:
     "On an island, electricity and drinking water are the same resource. EcoPulse reads the live forecast and plans the whole island, hour by hour.",
   icons: { icon: "/icon.svg" },

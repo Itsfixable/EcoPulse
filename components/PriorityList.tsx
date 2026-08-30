@@ -25,10 +25,12 @@ export default function PriorityList({
   };
 
   return (
-    <ol className="space-y-1.5">
+    <ol className="priority-list">
       {order.map((id, i) => {
-        const load = island.loads.find((l) => l.id === id)!;
+        const load = island.loads.find((l) => l.id === id);
+        if (!load) return null;
         const on = servedIds.includes(id);
+
         return (
           <li
             key={id}
@@ -39,19 +41,33 @@ export default function PriorityList({
               if (dragId && dragId !== id) move(order.indexOf(dragId), i);
             }}
             onDragEnd={() => setDragId(null)}
-            className={`flex cursor-grab items-center gap-2.5 rounded-lg px-2.5 py-2 ring-1 transition active:cursor-grabbing ${
-              dragId === id ? "bg-secondary ring-brand" : "ring-secondary hover:bg-secondary"
-            } ${on ? "opacity-100" : "opacity-45"}`}
+            className={`priority-row${dragId === id ? " is-dragging" : ""}${on ? "" : " is-paused"}`}
           >
-            <span className="tnum w-4 text-xs text-quaternary">{i + 1}</span>
-            <span
-              className="size-1.5 shrink-0 rounded-full"
-              style={{ background: on ? "var(--color-brand-500)" : "var(--color-fg-quaternary)" }}
-            />
-            <span className="flex-1 text-sm text-primary">{load.name}</span>
-            <span className="tnum text-xs text-tertiary">{load.kw} kW</span>
-            <span className="rounded px-1.5 py-0.5 text-xs text-quaternary ring-1 ring-secondary">
-              T{load.tier}
+            <span className="priority-rank">{i + 1}</span>
+            <span className="priority-name">{load.name}</span>
+            <span className="priority-kw">{load.kw} kW</span>
+            <span className="priority-tier">T{load.tier}</span>
+            {!on && <span className="priority-state">paused</span>}
+
+            {/* Buttons as well as dragging: reliable on touch, and reachable
+                from the keyboard, which drag-and-drop is not. */}
+            <span className="priority-moves">
+              <button
+                type="button"
+                aria-label={`Move ${load.name} up`}
+                disabled={i === 0}
+                onClick={() => move(i, i - 1)}
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                aria-label={`Move ${load.name} down`}
+                disabled={i === order.length - 1}
+                onClick={() => move(i, i + 1)}
+              >
+                ↓
+              </button>
             </span>
           </li>
         );

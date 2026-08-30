@@ -6,6 +6,10 @@ const PRESETS = [
   { slug: "santorini", name: "Santorini", country: "Greece", lat: 36.404, lon: 25.43, span: 20 },
   { slug: "bora-bora", name: "Bora Bora", country: "French Polynesia", lat: -16.5, lon: -151.741, span: 14 },
   { slug: "heimaey", name: "Heimaey", country: "Iceland", lat: 63.436, lon: -20.267, span: 12 },
+  { slug: "rapa-nui", name: "Rapa Nui", country: "Chile", lat: -27.117, lon: -109.355, span: 26 },
+  { slug: "madeira", name: "Madeira", country: "Portugal", lat: 32.75, lon: -16.97, span: 34 },
+  { slug: "maui", name: "Maui", country: "Hawaii", lat: 20.8, lon: -156.33, span: 48 },
+  { slug: "tenerife", name: "Tenerife", country: "Canary Islands", lat: 28.27, lon: -16.6, span: 46 },
 ];
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -23,7 +27,7 @@ async function main() {
     }
     if (fetched > 0) {
       console.log("  waiting 90s for the rate-limit window…");
-      await sleep(90_000);
+      await sleep(75_000);
     }
     fetched++;
     const grid = await fetchHeightGrid(p.lat, p.lon, 24, p.span);

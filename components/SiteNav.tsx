@@ -63,11 +63,7 @@ export default function SiteNav() {
             {s.label}
           </Link>
         ))}
-        <Link
-          href="/dashboard"
-          className="site-nav-cta"
-          aria-current={onDashboard ? "page" : undefined}
-        >
+        <Link href="/dashboard" aria-current={onDashboard ? "page" : undefined}>
           Live dashboard
         </Link>
       </div>

@@ -1,7 +1,7 @@
 [
   {
     "slug": "tau",
-    "name": "Ta'\u016b",
+    "name": "Ta'ū",
     "country": "American Samoa",
     "lat": -14.235,
     "lon": -169.455,
@@ -28,5 +28,55 @@
     "span": 14,
     "max": 482,
     "landFraction": 0.14930555555555555
+  },
+  {
+    "slug": "heimaey",
+    "name": "Heimaey",
+    "country": "Iceland",
+    "lat": 63.436,
+    "lon": -20.267,
+    "span": 12,
+    "max": 166,
+    "landFraction": 0.0920138888888889
+  },
+  {
+    "slug": "rapa-nui",
+    "name": "Rapa Nui",
+    "country": "Chile",
+    "lat": -27.117,
+    "lon": -109.355,
+    "span": 26,
+    "max": 456,
+    "landFraction": 0.2204861111111111
+  },
+  {
+    "slug": "madeira",
+    "name": "Madeira",
+    "country": "Portugal",
+    "lat": 32.75,
+    "lon": -16.97,
+    "span": 34,
+    "max": 1644,
+    "landFraction": 0.4861111111111111
+  },
+  {
+    "slug": "maui",
+    "name": "Maui",
+    "country": "Hawaii",
+    "lat": 20.8,
+    "lon": -156.33,
+    "span": 48,
+    "max": 2824,
+    "landFraction": 0.5850694444444444
+  },
+  {
+    "slug": "tenerife",
+    "name": "Tenerife",
+    "country": "Canary Islands",
+    "lat": 28.27,
+    "lon": -16.6,
+    "span": 46,
+    "max": 3260,
+    "landFraction": 0.6979166666666666
   }
 ]
