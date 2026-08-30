@@ -70,9 +70,14 @@ interface ChatOptions {
 export async function chat(opts: ChatOptions): Promise<ChatResult> {
   const provider = detectProvider();
   if (provider === "none") {
+    // Replit keeps secrets in its own pane, so pointing a Replit user at a
+    // .env.local file sends them somewhere that will not work.
+    const onReplit = Boolean(process.env.REPL_ID ?? process.env.REPLIT_DEV_DOMAIN);
+    const where = onReplit
+      ? "Add GEMINI_API_KEY in the Secrets pane (the lock icon), then stop and re-run the Repl."
+      : "Add GEMINI_API_KEY to .env.local, then restart the dev server.";
     return {
-      reply:
-        "No model API key is set, so the assistant is offline. Add GEMINI_API_KEY (free at aistudio.google.com), OPENAI_API_KEY, or ANTHROPIC_API_KEY to .env.local and restart the dev server. Everything else on this page works without it.",
+      reply: `No model API key is set, so the assistant is offline. ${where} A key is free at aistudio.google.com/apikey. OPENAI_API_KEY and ANTHROPIC_API_KEY work too. Everything else on this page works without one.`,
       toolInput: null,
     };
   }
