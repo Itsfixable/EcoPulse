@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Logo from "./Logo";
 
 const SECTIONS = [
@@ -11,43 +11,73 @@ const SECTIONS = [
   { id: "solutions", label: "Solutions" },
 ];
 
+/** Height of the sticky bar, so anchors land below it rather than under it. */
+const NAV_OFFSET = 88;
+
 export default function SiteNav() {
   const path = usePathname();
   const onDashboard = path.startsWith("/dashboard");
   const [active, setActive] = useState("home");
 
-  // Scroll spy: highlight whichever section is nearest the top of the
-  // viewport, so the nav reflects where the reader actually is rather than
-  // which link was last clicked.
-  useEffect(() => {
-    if (onDashboard) return;
-
+  const pick = useCallback(() => {
     const targets = SECTIONS.map((s) => document.getElementById(s.id)).filter(
       (el): el is HTMLElement => Boolean(el),
     );
     if (!targets.length) return;
 
-    const pick = () => {
-      const line = window.innerHeight * 0.35;
-      let current = targets[0].id;
-      for (const el of targets) {
-        if (el.getBoundingClientRect().top <= line) current = el.id;
-      }
-      setActive(current);
-    };
+    // At the bottom of the page the last section may never reach the marker
+    // line, so nothing would ever highlight it. Claim it explicitly.
+    const atBottom =
+      window.innerHeight + window.scrollY >= document.body.scrollHeight - 2;
+    if (atBottom) {
+      setActive(targets[targets.length - 1].id);
+      return;
+    }
 
-    pick();
+    const line = window.innerHeight * 0.35;
+    let current = targets[0].id;
+    for (const el of targets) {
+      if (el.getBoundingClientRect().top <= line) current = el.id;
+    }
+    setActive(current);
+  }, []);
+
+  useEffect(() => {
+    if (onDashboard) return;
+    // Deferred rather than called inline: setting state synchronously in an
+    // effect body cascades a render.
+    const raf = requestAnimationFrame(pick);
     window.addEventListener("scroll", pick, { passive: true });
     window.addEventListener("resize", pick);
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("scroll", pick);
       window.removeEventListener("resize", pick);
     };
-  }, [onDashboard]);
+  }, [onDashboard, pick]);
+
+  /**
+   * Drive the jump ourselves rather than relying on the hash. A hash that is
+   * already set produces no navigation, so clicking the section you are on,
+   * or any section already in view, did nothing at all.
+   */
+  const goTo = (e: React.MouseEvent, id: string) => {
+    if (onDashboard) return; // let the link navigate to the landing page
+    const el = id === "home" ? null : document.getElementById(id);
+    if (id !== "home" && !el) return;
+
+    e.preventDefault();
+    setActive(id);
+
+    const top = el ? window.scrollY + el.getBoundingClientRect().top - NAV_OFFSET : 0;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
+
+    history.replaceState(null, "", id === "home" ? "/" : `#${id}`);
+  };
 
   return (
     <nav className="site-nav">
-      <span className="scroll-progress" aria-hidden="true" />
       <Link href="/" className="site-nav-brand" aria-label="EcoPulse home">
         <Logo size={30} />
         <span>EcoPulse</span>
@@ -58,6 +88,7 @@ export default function SiteNav() {
           <Link
             key={s.id}
             href={s.id === "home" ? "/" : `/#${s.id}`}
+            onClick={(e) => goTo(e, s.id)}
             aria-current={!onDashboard && active === s.id ? "page" : undefined}
           >
             {s.label}
