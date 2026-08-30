@@ -17,6 +17,12 @@ read_key() {
     v="$(awk -F= -v n="$1" '$1==n {x=substr($0,index($0,"=")+1); gsub(/^[ \t"\x27]+|[ \t"\x27\r]+$/,"",x); print x}' .env.local)"
   fi
   [ -n "$v" ] || v="$(printenv "$1" 2>/dev/null || true)"
+  # Trim whatever the source was: a secret pasted with a trailing space or
+  # newline is the usual cause of a 401 on a key that is otherwise fine.
+  v="${v#"${v%%[![:space:]]*}"}"
+  v="${v%"${v##*[![:space:]]}"}"
+  v="${v%\"}"; v="${v#\"}"
+  v="${v%\'}"; v="${v#\'}"
   printf %s "$v"
 }
 
@@ -24,7 +30,12 @@ check() {
   local name="$1" key http
   key="$(read_key "$name")"
   [ -n "$key" ] || return 0
+  local rawlen
+  rawlen=$(printenv "$name" 2>/dev/null | wc -c | tr -d ' ')
   printf '%s (%d chars)\n' "$name" "${#key}"
+  if [ -n "$rawlen" ] && [ "$rawlen" -gt 0 ] && [ "$((rawlen - 1))" -ne "${#key}" ]; then
+    echo "  ! the stored value has surrounding whitespace or quotes; trimmed before testing"
+  fi
 
   case "$name" in
     GEMINI_API_KEY)

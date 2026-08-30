@@ -3,13 +3,22 @@ import OpenAI from "openai";
 
 export type Provider = "gemini" | "openai" | "anthropic" | "none";
 
+/**
+ * Secrets pasted through a web form often carry a trailing newline or space,
+ * which the provider rejects as an invalid key. Trim before use.
+ */
+function key(name: string): string | undefined {
+  const v = process.env[name]?.trim();
+  return v ? v : undefined;
+}
+
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/";
 
 /** Whichever key is present wins, cheapest-to-run first. */
 export function detectProvider(): Provider {
-  if (process.env.GEMINI_API_KEY) return "gemini";
-  if (process.env.OPENAI_API_KEY) return "openai";
-  if (process.env.ANTHROPIC_API_KEY) return "anthropic";
+  if (key("GEMINI_API_KEY")) return "gemini";
+  if (key("OPENAI_API_KEY")) return "openai";
+  if (key("ANTHROPIC_API_KEY")) return "anthropic";
   return "none";
 }
 
@@ -92,8 +101,8 @@ async function viaOpenAICompatible(
 ): Promise<ChatResult> {
   const client =
     provider === "gemini"
-      ? new OpenAI({ apiKey: process.env.GEMINI_API_KEY, baseURL: GEMINI_BASE })
-      : new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      ? new OpenAI({ apiKey: key("GEMINI_API_KEY"), baseURL: GEMINI_BASE })
+      : new OpenAI({ apiKey: key("OPENAI_API_KEY") });
 
   const models = provider === "gemini" ? geminiModels() : [providerLabel(provider)];
 
@@ -164,7 +173,7 @@ async function viaOpenAICompatible(
 /* --------------------------------- Anthropic --------------------------------- */
 
 async function viaAnthropic(opts: ChatOptions): Promise<ChatResult> {
-  const client = new Anthropic();
+  const client = new Anthropic({ apiKey: key("ANTHROPIC_API_KEY") });
   const tools: Anthropic.Tool[] = [
     {
       name: opts.tool.name,
