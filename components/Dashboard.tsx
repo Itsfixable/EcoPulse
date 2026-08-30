@@ -231,7 +231,7 @@ export default function Dashboard({
         <div className={`optimize-bar${optimized ? " is-on" : ""}`}>
           <div className="optimize-copy">
             <p className="optimize-state">
-              {optimized ? "Running the EcoPulse plan" : "Running today's fixed schedule"}
+              {optimized ? "Running the EcoPulse plan" : "Running the default plan"}
             </p>
             <p className="optimize-detail">
               {optimized
@@ -258,7 +258,7 @@ export default function Dashboard({
             }}
             aria-pressed={optimized}
           >
-            {optimized ? "Show the fixed schedule" : "Optimise the day"}
+            {optimized ? "Show default plan" : "Optimise the day"}
           </button>
         </div>
 
@@ -270,8 +270,8 @@ export default function Dashboard({
             unit="L"
             sub={
               optimized
-                ? `${Math.round(cmp.dieselSavedPct)}% less than the fixed schedule`
-                : `today's fixed schedule`
+                ? `${Math.round(cmp.dieselSavedPct)}% less than the default plan`
+                : `on the default plan`
             }
             tone={optimized ? "good" : "warn"}
           />
@@ -282,7 +282,7 @@ export default function Dashboard({
             unit="kg"
             sub={
               optimized
-                ? `against ${Math.round(cmp.naive.totals.dieselL)} L on the fixed schedule`
+                ? `against ${Math.round(cmp.naive.totals.dieselL)} L on the default plan`
                 : "nothing avoided yet"
             }
             tone={optimized ? "good" : "warn"}
