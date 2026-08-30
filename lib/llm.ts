@@ -13,9 +13,25 @@ export function detectProvider(): Provider {
   return "none";
 }
 
+/**
+ * Gemini's newest flash models return 503 under load, so try a chain and fall
+ * through on overload. GEMINI_MODEL pins a single model when set.
+ */
+const GEMINI_CHAIN = [
+  "gemini-3.5-flash",
+  "gemini-3.6-flash",
+  "gemini-flash-latest",
+  "gemini-3.1-flash-lite",
+];
+
+function geminiModels(): string[] {
+  const pinned = process.env.GEMINI_MODEL;
+  return pinned ? [pinned] : GEMINI_CHAIN;
+}
+
 export function providerLabel(p: Provider): string {
   return p === "gemini"
-    ? (process.env.GEMINI_MODEL ?? "gemini-2.5-flash")
+    ? geminiModels()[0]
     : p === "openai"
       ? (process.env.OPENAI_MODEL ?? "gpt-4o")
       : p === "anthropic"
@@ -38,6 +54,8 @@ export interface ChatTurn {
 export interface ChatResult {
   reply: string;
   toolInput: unknown | null;
+  /** Which model actually served the reply, after any fallback. */
+  model?: string;
 }
 
 interface ChatOptions {
@@ -72,7 +90,7 @@ async function viaOpenAICompatible(
       ? new OpenAI({ apiKey: process.env.GEMINI_API_KEY, baseURL: GEMINI_BASE })
       : new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  const model = providerLabel(provider);
+  const models = provider === "gemini" ? geminiModels() : [providerLabel(provider)];
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: "system", content: opts.system },
@@ -91,15 +109,35 @@ async function viaOpenAICompatible(
   ];
 
   let toolInput: unknown | null = null;
+  let modelIndex = 0;
+
+  /** Falls through the chain when a model is overloaded or retired. */
+  const complete = async () => {
+    let lastErr: unknown;
+    for (; modelIndex < models.length; modelIndex++) {
+      try {
+        return await client.chat.completions.create({
+          model: models[modelIndex],
+          messages,
+          tools,
+        });
+      } catch (e) {
+        lastErr = e;
+        const status = (e as { status?: number }).status;
+        if (status !== 503 && status !== 404 && status !== 429) throw e;
+      }
+    }
+    throw lastErr;
+  };
 
   for (let round = 0; round <= (opts.maxToolRounds ?? 2); round++) {
-    const res = await client.chat.completions.create({ model, messages, tools });
+    const res = await complete();
     const msg = res.choices[0]?.message;
     if (!msg) break;
 
     const calls = msg.tool_calls ?? [];
     if (!calls.length) {
-      return { reply: (msg.content ?? "").trim(), toolInput };
+      return { reply: (msg.content ?? "").trim(), toolInput, model: models[modelIndex] };
     }
 
     messages.push(msg);
@@ -115,7 +153,7 @@ async function viaOpenAICompatible(
     }
   }
 
-  return { reply: "I could not finish that request.", toolInput };
+  return { reply: "I could not finish that request.", toolInput, model: models[modelIndex] };
 }
 
 /* --------------------------------- Anthropic --------------------------------- */
@@ -174,7 +212,7 @@ async function viaAnthropic(opts: ChatOptions): Promise<ChatResult> {
     .join("\n")
     .trim();
 
-  return { reply, toolInput };
+  return { reply, toolInput, model: "claude-opus-5" };
 }
 
 function safeParse(s: string): unknown {

@@ -83,7 +83,7 @@ export async function POST(req: Request) {
   let applied: Scenario | null = null;
 
   try {
-    const { reply } = await chat({
+    const { reply, model } = await chat({
       system: SYSTEM,
       messages: [
         { role: "user", content: `Current plan:\n${brief(forecast, active)}` },
@@ -100,7 +100,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       reply,
       scenario: applied,
-      provider: providerLabel(detectProvider()),
+      provider: model ?? providerLabel(detectProvider()),
     });
   } catch (e) {
     return NextResponse.json({

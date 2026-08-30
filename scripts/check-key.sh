@@ -16,8 +16,15 @@ check() {
 
   case "$name" in
     GEMINI_API_KEY)
-      if ! printf %s "$key" | grep -qE '^AIza[A-Za-z0-9_-]{35}$'; then
-        echo "  ✗ malformed — expected exactly 39 chars: AIza + 35 of [A-Za-z0-9_-]"
+      # Google is migrating from "Standard" AIza keys to "Auth" AQ. keys;
+      # AI Studio issues AQ. for all new keys, and AIza keys stop working in
+      # September 2026.
+      if printf %s "$key" | grep -qE '^AQ\.[A-Za-z0-9_.-]{20,}$'; then
+        :
+      elif printf %s "$key" | grep -qE '^AIza[A-Za-z0-9_-]{35}$'; then
+        echo "  ! legacy Standard key — Google stops accepting these in Sept 2026"
+      else
+        echo "  ✗ malformed — expected an AQ. auth key or a 39-char AIza key"
       fi
       http=$(curl -s -o /dev/null -w '%{http_code}' \
         "https://generativelanguage.googleapis.com/v1beta/models?key=$key")
