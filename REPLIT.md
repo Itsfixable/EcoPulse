@@ -7,6 +7,31 @@
 3. Press **Run**. First boot installs dependencies and takes a few minutes —
    Three.js and Next.js are large.
 
+## Use `npm ci`, not `npm install`
+
+`npm install` rewrites `package-lock.json` whenever Replit's npm resolves the
+tree even slightly differently from the machine that generated it. The lockfile
+is tracked, so the next `git pull` then aborts with:
+
+```
+error: Your local changes to the following files would be overwritten by merge:
+    package-lock.json
+```
+
+If you hit that, the lockfile is generated and yours can be discarded:
+
+```bash
+git checkout -- package-lock.json
+git pull origin main
+```
+
+To stop it recurring, install with `npm ci`. It installs exactly what the
+lockfile specifies and never modifies it:
+
+```bash
+npm ci
+```
+
 ## API key
 
 Do **not** create a `.env.local` on Replit. Use the **Secrets** pane (lock icon):
