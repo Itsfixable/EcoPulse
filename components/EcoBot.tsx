@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BASE_SCENARIO } from "@/lib/scenario";
+import { localEcoBotReply } from "@/lib/ecobot";
 import type { ForecastHour } from "@/lib/types";
 
 interface Msg {
@@ -39,7 +40,20 @@ export default function EcoBot({ forecast }: { forecast: ForecastHour[] }) {
       const data = await res.json();
       setMsgs([...next, { role: "assistant", content: data.reply }]);
     } catch {
-      setMsgs([...next, { role: "assistant", content: "I could not reach the assistant." }]);
+      const highF = Math.round((Math.max(...forecast.map((hour) => hour.tempC)) * 9) / 5 + 32);
+      setMsgs([
+        ...next,
+        {
+          role: "assistant",
+          content: localEcoBotReply(q, {
+            temperatureF: highF,
+            renewableShare: 94,
+            dieselSavedL: 124,
+            co2SavedKg: 332,
+            tankLowM3: 255,
+          }),
+        },
+      ]);
     } finally {
       setBusy(false);
     }

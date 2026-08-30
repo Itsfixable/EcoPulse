@@ -10,7 +10,6 @@ import Timeline from "./Timeline";
 import PriorityList from "./PriorityList";
 import Assistant from "./Assistant";
 import IslandPicker, { type PresetIsland } from "./IslandPicker";
-import Logo from "./Logo";
 import { Card, CardHead, Metric } from "./ui";
 import { buildTerrain, placeSites } from "./terrain";
 import type { HeightGrid } from "@/lib/elevation";
@@ -134,11 +133,11 @@ export default function Dashboard({
 
   return (
     <div ref={shell} className="min-h-screen bg-secondary">
-      <header className="sticky top-0 z-30 border-b border-secondary bg-primary/85 backdrop-blur">
-        <div className="mx-auto flex max-w-[1480px] flex-wrap items-center gap-x-3 gap-y-2 px-6 py-3">
-          <Logo size={28} />
-          <h1 className="display text-lg text-primary">EcoPulse</h1>
-          <span className="hidden text-sm text-tertiary sm:inline">
+
+      <main className="mx-auto max-w-[1480px] px-6 py-6">
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="display text-lg text-primary">Island control</h1>
+          <span className="text-sm text-tertiary">
             {placeName}
             {placeCountry ? `, ${placeCountry}` : ""}
           </span>
@@ -153,9 +152,7 @@ export default function Dashboard({
             {staleWeather ? "Weather service busy" : live ? "Live forecast" : "Cached forecast"}
           </span>
         </div>
-      </header>
 
-      <main className="mx-auto max-w-[1480px] px-6 py-6">
         <div className="mb-6 max-w-3xl">
           <p className="display text-xl leading-snug text-primary sm:text-display-xs">
             On an island, electricity and drinking water are the same resource.

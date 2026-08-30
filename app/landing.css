@@ -65,7 +65,7 @@
 .lp .nav-cta:hover { background: var(--gold); color: var(--night) !important; }
 
 .lp .hero {
-  min-height: 620px;
+  min-height: 600px;
   display: flex;
   align-items: center;
   padding: 80px 10%;

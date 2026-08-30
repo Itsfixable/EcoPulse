@@ -1,7 +1,6 @@
 import Link from "next/link";
 import "./landing.css";
 import EcoBot from "@/components/EcoBot";
-import Logo from "@/components/Logo";
 import { TAU } from "@/lib/island";
 import { compare } from "@/lib/dispatch";
 import { normalize, fetchForecast, type RawForecast } from "@/lib/openmeteo";
@@ -36,20 +35,6 @@ export default async function Landing() {
 
   return (
     <div className="lp">
-      <nav>
-        <h2 className="wordmark">
-          <Logo size={30} />
-          EcoPulse
-        </h2>
-        <div className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#dashboard">Today</a>
-          <a href="#solutions">Solutions</a>
-          <Link href="/dashboard" className="nav-cta">
-            Live dashboard
-          </Link>
-        </div>
-      </nav>
 
       <section id="home" className="hero">
         <div className="hero-content">
