@@ -109,6 +109,12 @@ export function solve(
       (l) => !l.shiftable || sched.get(l.id)?.has(h),
     );
 
+    // The operator's ordering is authoritative, not the static tier: the
+    // generator backs only the highest-ranked loads, as many as there are
+    // non-deferrable ones. Promote the ice plant and it displaces something
+    // else from that protection.
+    const dieselRankLimit = c.loads.filter((l) => !l.shiftable).length;
+
     const served: string[] = [];
     const shed: string[] = [];
     let usedBattery = 0;
@@ -117,7 +123,8 @@ export function solve(
 
     for (const load of candidates) {
       const kw = loadKw(load, h);
-      const mayUseDiesel = mode === "naive" || load.tier < 3;
+      const rank = ordered.indexOf(load);
+      const mayUseDiesel = mode === "naive" || rank < dieselRankLimit;
       const available = renewLeft + batteryLeft + (mayUseDiesel ? dieselLeft : 0);
 
       if (available + 1e-6 < kw) {

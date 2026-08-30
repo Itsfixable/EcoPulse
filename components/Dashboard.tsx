@@ -105,6 +105,7 @@ export default function Dashboard({
   const dieselDelta = Math.round(
     cmp.ecopulse.totals.dieselL - baseline.ecopulse.totals.dieselL,
   );
+  const outageHours = cmp.ecopulse.totals.criticalOutageHours;
   const plan = cmp.ecopulse;
   const now = plan.hours[hourIndex];
 
@@ -269,7 +270,7 @@ export default function Dashboard({
 
           <div className="flex flex-col gap-4 lg:col-span-4">
             <Card>
-              <CardHead title="Who gets power first" hint="Drag to reorder. The day re-solves instantly." />
+              <CardHead title="Who gets power first" hint="Drag a row, or focus one and use the arrow keys. The whole day re-solves as you move it." />
               <PriorityList
                 island={island}
                 order={order}
@@ -277,27 +278,41 @@ export default function Dashboard({
                 servedIds={now.servedLoadIds}
               />
               <p
-                className={`priority-delta${dieselDelta === 0 ? " is-neutral" : ""}`}
+                className={`priority-delta${
+                  outageHours > 0 ? " is-severe" : dieselDelta === 0 ? " is-neutral" : ""
+                }`}
                 aria-live="polite"
               >
-                {dieselDelta === 0 ? (
-                  <>This ordering costs the same fuel as the tiered default.</>
+                {outageHours > 0 ? (
+                  <>
+                    This order leaves the clinic, pumps or comms tower without power for{" "}
+                    <strong>
+                      {outageHours} hour{outageHours === 1 ? "" : "s"}
+                    </strong>
+                    . Whatever you moved above them, the island is paying for it in blackouts.
+                  </>
                 ) : dieselDelta > 0 ? (
                   <>
-                    This ordering burns <strong>{dieselDelta} L more diesel</strong> today than the
-                    tiered default. Putting industry above people has a price, and it is this.
+                    This order costs <strong>{dieselDelta} litres more diesel</strong> today.
+                    Loads you rank highly get the generator when the sun runs out, and the
+                    generator runs on fuel that arrives by boat.
+                  </>
+                ) : dieselDelta < 0 ? (
+                  <>
+                    This order saves <strong>{Math.abs(dieselDelta)} litres of diesel</strong>{" "}
+                    today, by leaving more of the island on renewables when supply is tight.
                   </>
                 ) : (
                   <>
-                    This ordering saves <strong>{Math.abs(dieselDelta)} L of diesel</strong> today
-                    against the tiered default.
+                    Same fuel as the default order. There is enough sun today that everyone gets
+                    served either way. Ordering only bites in the hours when supply runs short.
                   </>
                 )}
               </p>
               <p className="mt-3 text-xs leading-relaxed text-tertiary">
-                An automated system that rations power is making an ethical choice. We exposed the
-                choice instead of hiding it in a constant. The algorithm does the maths, people
-                decide what matters.
+                Any system that rations power decides who goes without. That decision belongs to
+                the island, not to us, so it sits here in the open rather than buried in a
+                constant. The solver does the arithmetic. You set what matters.
               </p>
             </Card>
           </div>

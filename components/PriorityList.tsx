@@ -35,40 +35,31 @@ export default function PriorityList({
           <li
             key={id}
             draggable
+            tabIndex={0}
+            role="button"
+            aria-label={`${load.name}, position ${i + 1} of ${order.length}. Use arrow keys to move it.`}
             onDragStart={() => setDragId(id)}
             onDragOver={(e) => {
               e.preventDefault();
               if (dragId && dragId !== id) move(order.indexOf(dragId), i);
             }}
             onDragEnd={() => setDragId(null)}
+            // Arrow keys stand in for dragging, which no keyboard can do.
+            onKeyDown={(e) => {
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                move(i, i - 1);
+              } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                move(i, i + 1);
+              }
+            }}
             className={`priority-row${dragId === id ? " is-dragging" : ""}${on ? "" : " is-paused"}`}
           >
             <span className="priority-rank">{i + 1}</span>
             <span className="priority-name">{load.name}</span>
             <span className="priority-kw">{load.kw} kW</span>
-            <span className="priority-tier">T{load.tier}</span>
             {!on && <span className="priority-state">paused</span>}
-
-            {/* Buttons as well as dragging: reliable on touch, and reachable
-                from the keyboard, which drag-and-drop is not. */}
-            <span className="priority-moves">
-              <button
-                type="button"
-                aria-label={`Move ${load.name} up`}
-                disabled={i === 0}
-                onClick={() => move(i, i - 1)}
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                aria-label={`Move ${load.name} down`}
-                disabled={i === order.length - 1}
-                onClick={() => move(i, i + 1)}
-              >
-                ↓
-              </button>
-            </span>
           </li>
         );
       })}

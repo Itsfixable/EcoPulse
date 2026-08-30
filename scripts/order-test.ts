@@ -4,20 +4,29 @@ import { normalize, type RawForecast } from "../lib/openmeteo";
 import { compare } from "../lib/dispatch";
 
 const forecast = normalize(raw as RawForecast);
+const base = ["clinic", "pumps", "comms", "homes", "school", "desal", "ice"];
 
-const orders: [string, string[]][] = [
-  ["default (tier order)", ["clinic", "pumps", "comms", "homes", "school", "desal", "ice"]],
-  ["school above desal", ["clinic", "pumps", "comms", "school", "homes", "desal", "ice"]],
-  ["desal first", ["desal", "clinic", "pumps", "comms", "homes", "school", "ice"]],
-  ["ice + desal above people", ["ice", "desal", "clinic", "pumps", "comms", "homes", "school"]],
-  ["homes last", ["clinic", "pumps", "comms", "school", "desal", "ice", "homes"]],
+const swap = (a: number, b: number) => {
+  const o = [...base];
+  [o[a], o[b]] = [o[b], o[a]];
+  return o;
+};
+
+const cases: [string, string[]][] = [
+  ["baseline (tier order)", base],
+  ["swap clinic <-> pumps", swap(0, 1)],
+  ["swap homes <-> school", swap(3, 4)],
+  ["school above homes+comms", ["clinic", "pumps", "school", "comms", "homes", "desal", "ice"]],
+  ["desal one step up", ["clinic", "pumps", "comms", "homes", "desal", "school", "ice"]],
+  ["desal two steps up", ["clinic", "pumps", "comms", "desal", "homes", "school", "ice"]],
+  ["ice to the very top", ["ice", "clinic", "pumps", "comms", "homes", "school", "desal"]],
+  ["clinic to the bottom", ["pumps", "comms", "homes", "school", "desal", "ice", "clinic"]],
 ];
 
-for (const [label, order] of orders) {
-  const c = compare(TAU, forecast, order);
-  const p = c.ecopulse;
-  const shedHours = p.hours.filter((h) => h.shedLoadIds.length).length;
+for (const [label, order] of cases) {
+  const p = compare(TAU, forecast, order).ecopulse;
+  const shed = p.hours.filter((h) => h.shedLoadIds.length).length;
   console.log(
-    `${label.padEnd(26)} diesel ${p.totals.dieselL.toFixed(0).padStart(4)} L | outages ${p.totals.criticalOutageHours} | tank low ${p.totals.tankMinM3.toFixed(0).padStart(3)} | hours with a shed load ${shedHours}`,
+    `${label.padEnd(26)} diesel ${p.totals.dieselL.toFixed(0).padStart(4)} | outage h ${p.totals.criticalOutageHours} | shed h ${shed} | tank ${p.totals.tankMinM3.toFixed(0)}`,
   );
 }

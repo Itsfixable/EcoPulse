@@ -432,6 +432,11 @@ body {
   border: 1px solid color-mix(in srgb, var(--color-solar) 45%, transparent);
 }
 
+.priority-row:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
 .priority-moves { display: flex; gap: 2px; }
 .priority-moves button {
   width: 20px;
@@ -603,4 +608,9 @@ body {
 @keyframes chat-enter {
   from { opacity: 0; transform: translateY(14px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.priority-delta.is-severe {
+  border-color: color-mix(in srgb, var(--color-diesel) 60%, transparent);
+  background: color-mix(in srgb, var(--color-diesel) 18%, transparent);
 }
