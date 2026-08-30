@@ -105,6 +105,21 @@ done
 
 if [ "$found" -eq 0 ]; then
   echo "No model key found in .env.local or the environment."
+  echo
+  # Names only, never values: enough to see whether a secret exists under a
+  # name the app does not read, or whether the shell cannot see it at all.
+  related="$(printenv | cut -d= -f1 | grep -iE 'gemini|openai|anthropic|api.?key' | sort || true)"
+  if [ -n "$related" ]; then
+    echo "This shell can see these related variables:"
+    printf '  %s\n' $related
+    echo "The app reads only GEMINI_API_KEY, OPENAI_API_KEY or ANTHROPIC_API_KEY."
+    echo "Rename yours to one of those exactly."
+  else
+    echo "This shell sees no key-like variables at all."
+    echo "Either the secret is not saved, or this shell started before you added it."
+    echo "Open a new shell tab and run this again."
+  fi
+  echo
   echo "On Replit: add GEMINI_API_KEY in the Secrets pane, then stop and re-run the Repl."
   echo "Locally:   echo 'GEMINI_API_KEY=...' >> .env.local, then restart the dev server."
 fi
