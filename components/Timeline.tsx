@@ -41,19 +41,20 @@ export default function Timeline({
 
       const cols = gsap.utils.toArray<SVGGElement>(".hour-col");
       if (cols.length) {
+        // Origin is set once, before the tween, so GSAP owns it outright.
+        gsap.set(cols, { transformOrigin: "50% 100%" });
         gsap.fromTo(
           cols,
           { scaleY: 0 },
           {
             scaleY: 1,
-            transformOrigin: "50% 100%",
-            duration: 0.72,
-            ease: "power3.out",
-            stagger: 0.024,
+            duration: 0.55,
+            // A plain numeric stagger: the object form was swallowing the
+            // tween's own ease and the bars grew at a constant rate, which is
+            // what made the motion feel mechanical.
+            ease: "power2.out",
+            stagger: 0.018,
             overwrite: "auto",
-            // Drop the inline transform once done, so nothing can be left
-            // half-scaled if this re-runs mid-flight.
-            clearProps: "transform",
           },
         );
       }
@@ -121,7 +122,7 @@ export default function Timeline({
           return (
             <g key={i} onClick={() => onHour(i)} style={{ cursor: "pointer" }}>
               <rect x={PAD_L + i * bw} y={PAD_T} width={bw} height={gh} fill="transparent" />
-              <g className="hour-col" style={{ transformBox: "fill-box", transformOrigin: "bottom" }}>
+              <g className="hour-col">
               {BANDS.map((b) => {
                 const raw = h[b.key] as number;
                 const v = b.key === "batteryKw" ? Math.max(0, raw) : raw;
